@@ -1,0 +1,335 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AttMeanAggregator	aggregators.py	/^class AttMeanAggregator(Layer):$/;"	c
+AttMeanAggregator	models.py	/^from .aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+AttMeanAggregator	supervised_models.py	/^from graphsage.aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+BipartiteEdgePredLayer	models.py	/^from .prediction import BipartiteEdgePredLayer$/;"	i
+BipartiteEdgePredLayer	prediction.py	/^class BipartiteEdgePredLayer(Layer):$/;"	c
+Dense	aggregators.py	/^from .layers import Layer, Dense$/;"	i
+Dense	layers.py	/^class Dense(Layer):$/;"	c
+EdgeMinibatchIterator	minibatch.py	/^class EdgeMinibatchIterator(object):$/;"	c
+EdgeMinibatchIterator	unsupervised_train.py	/^from graphsage.minibatch import EdgeMinibatchIterator$/;"	i
+FLAGS	layers.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	models.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	neigh_samplers.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	neigh_samplers_org.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	prediction.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	supervised_models.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	supervised_test.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	supervised_train.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	supervised_train_.py	/^FLAGS = flags.FLAGS$/;"	v
+FLAGS	unsupervised_train.py	/^FLAGS = flags.FLAGS$/;"	v
+G	utils.py	/^    G = G.subgraph(nodes)$/;"	v
+G	utils.py	/^    G = json_graph.node_link_graph(G_data)$/;"	v
+GCNAggregator	aggregators.py	/^class GCNAggregator(Layer):$/;"	c
+GCNAggregator	models.py	/^from .aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+GCNAggregator	supervised_models.py	/^from graphsage.aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+GPU_MEM_FRACTION	supervised_test.py	/^GPU_MEM_FRACTION = 0.8$/;"	v
+GPU_MEM_FRACTION	supervised_train.py	/^GPU_MEM_FRACTION = 0.8$/;"	v
+GPU_MEM_FRACTION	supervised_train_.py	/^GPU_MEM_FRACTION = 0.8$/;"	v
+GPU_MEM_FRACTION	unsupervised_train.py	/^GPU_MEM_FRACTION = 0.8$/;"	v
+G_data	utils.py	/^    G_data = json.load(open(graph_file))$/;"	v
+GeneralizedModel	models.py	/^class GeneralizedModel(Model):$/;"	c
+Layer	aggregators.py	/^from .layers import Layer, Dense$/;"	i
+Layer	layers.py	/^class Layer(object):$/;"	c
+Layer	neigh_samplers.py	/^from graphsage.layers import Layer$/;"	i
+Layer	neigh_samplers_org.py	/^from graphsage.layers import Layer$/;"	i
+Layer	prediction.py	/^from graphsage.layers import Layer$/;"	i
+MLNeighborSampler	neigh_samplers.py	/^class MLNeighborSampler(Layer):$/;"	c
+MLNeighborSampler	supervised_train.py	/^from graphsage.neigh_samplers import UniformNeighborSampler, MLNeighborSampler$/;"	i
+MLNeighborSampler	supervised_train_.py	/^from graphsage.neigh_samplers import UniformNeighborSampler, MLNeighborSampler$/;"	i
+MLP	models.py	/^class MLP(Model):$/;"	c
+MaxPoolingAggregator	aggregators.py	/^class MaxPoolingAggregator(Layer):$/;"	c
+MaxPoolingAggregator	models.py	/^from .aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+MaxPoolingAggregator	supervised_models.py	/^from graphsage.aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+MeanAggregator	aggregators.py	/^class MeanAggregator(Layer):$/;"	c
+MeanAggregator	models.py	/^from .aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+MeanAggregator	supervised_models.py	/^from graphsage.aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+MeanPoolingAggregator	aggregators.py	/^class MeanPoolingAggregator(Layer):$/;"	c
+MeanPoolingAggregator	models.py	/^from .aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+MeanPoolingAggregator	supervised_models.py	/^from graphsage.aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+Model	models.py	/^class Model(object):$/;"	c
+N_WALKS	utils.py	/^N_WALKS=50$/;"	v
+Node2VecModel	models.py	/^class Node2VecModel(GeneralizedModel):$/;"	c
+Node2VecModel	unsupervised_train.py	/^from graphsage.models import SampleAndAggregate, SAGEInfo, Node2VecModel$/;"	i
+NodeMinibatchIterator	minibatch.py	/^class NodeMinibatchIterator(object):$/;"	c
+NodeMinibatchIterator	supervised_test.py	/^from graphsage.minibatch import NodeMinibatchIterator$/;"	i
+NodeMinibatchIterator	supervised_train.py	/^from graphsage.minibatch import NodeMinibatchIterator$/;"	i
+NodeMinibatchIterator	supervised_train_.py	/^from graphsage.minibatch import NodeMinibatchIterator$/;"	i
+SAGEInfo	models.py	/^SAGEInfo = namedtuple("SAGEInfo",$/;"	v
+SAGEInfo	supervised_test.py	/^from graphsage.models import SAGEInfo$/;"	i
+SAGEInfo	supervised_train.py	/^from graphsage.models import SAGEInfo$/;"	i
+SAGEInfo	supervised_train_.py	/^from graphsage.models import SAGEInfo$/;"	i
+SAGEInfo	unsupervised_train.py	/^from graphsage.models import SampleAndAggregate, SAGEInfo, Node2VecModel$/;"	i
+SampleAndAggregate	models.py	/^class SampleAndAggregate(GeneralizedModel):$/;"	c
+SampleAndAggregate	unsupervised_train.py	/^from graphsage.models import SampleAndAggregate, SAGEInfo, Node2VecModel$/;"	i
+SeqAggregator	aggregators.py	/^class SeqAggregator(Layer):$/;"	c
+SeqAggregator	models.py	/^from .aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+SeqAggregator	supervised_models.py	/^from graphsage.aggregators import MeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator$/;"	i
+StandardScaler	utils.py	/^        from sklearn.preprocessing import StandardScaler$/;"	i
+SupervisedGraphsage	supervised_models.py	/^class SupervisedGraphsage(models.SampleAndAggregate):$/;"	c
+SupervisedGraphsage	supervised_test.py	/^from graphsage.supervised_models import SupervisedGraphsage$/;"	i
+SupervisedGraphsage	supervised_train.py	/^from graphsage.supervised_models import SupervisedGraphsage$/;"	i
+SupervisedGraphsage	supervised_train_.py	/^from graphsage.supervised_models import SupervisedGraphsage$/;"	i
+TwoMaxLayerPoolingAggregator	aggregators.py	/^class TwoMaxLayerPoolingAggregator(Layer):$/;"	c
+UniformNeighborSampler	neigh_samplers.py	/^class UniformNeighborSampler(Layer):$/;"	c
+UniformNeighborSampler	neigh_samplers_org.py	/^class UniformNeighborSampler(Layer):$/;"	c
+UniformNeighborSampler	supervised_test.py	/^from graphsage.neigh_samplers import UniformNeighborSampler$/;"	i
+UniformNeighborSampler	supervised_train.py	/^from graphsage.neigh_samplers import UniformNeighborSampler, MLNeighborSampler$/;"	i
+UniformNeighborSampler	supervised_train_.py	/^from graphsage.neigh_samplers import UniformNeighborSampler, MLNeighborSampler$/;"	i
+UniformNeighborSampler	unsupervised_train.py	/^from graphsage.neigh_samplers import UniformNeighborSampler$/;"	i
+WALK_LEN	utils.py	/^WALK_LEN=5$/;"	v
+_LAYER_UIDS	layers.py	/^_LAYER_UIDS = {}$/;"	v
+__call__	layers.py	/^    def __call__(self, inputs):$/;"	m	class:Layer	file:
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, model_size="small", neigh_input_dim=None,$/;"	m	class:MaxPoolingAggregator
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, model_size="small", neigh_input_dim=None,$/;"	m	class:MeanPoolingAggregator
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, model_size="small", neigh_input_dim=None,$/;"	m	class:SeqAggregator
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, model_size="small", neigh_input_dim=None,$/;"	m	class:TwoMaxLayerPoolingAggregator
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, neigh_input_dim=None,$/;"	m	class:AttMeanAggregator
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, neigh_input_dim=None,$/;"	m	class:GCNAggregator
+__init__	aggregators.py	/^    def __init__(self, input_dim, output_dim, neigh_input_dim=None,$/;"	m	class:MeanAggregator
+__init__	layers.py	/^    def __init__(self, **kwargs):$/;"	m	class:Layer
+__init__	layers.py	/^    def __init__(self, input_dim, output_dim, dropout=0., $/;"	m	class:Dense
+__init__	minibatch.py	/^    def __init__(self, G, id2idx, $/;"	m	class:EdgeMinibatchIterator
+__init__	minibatch.py	/^    def __init__(self, G, id2idx, $/;"	m	class:NodeMinibatchIterator
+__init__	models.py	/^    def __init__(self, **kwargs):$/;"	m	class:GeneralizedModel
+__init__	models.py	/^    def __init__(self, **kwargs):$/;"	m	class:Model
+__init__	models.py	/^    def __init__(self, placeholders, dict_size, degrees, name=None,$/;"	m	class:Node2VecModel
+__init__	models.py	/^    def __init__(self, placeholders, dims, categorical=True, **kwargs):$/;"	m	class:MLP
+__init__	models.py	/^    def __init__(self, placeholders, features, adj, degrees,$/;"	m	class:SampleAndAggregate
+__init__	neigh_samplers.py	/^    def __init__(self, adj_info, **kwargs):$/;"	m	class:UniformNeighborSampler
+__init__	neigh_samplers.py	/^    def __init__(self, adj_info, features, **kwargs):$/;"	m	class:MLNeighborSampler
+__init__	neigh_samplers_org.py	/^    def __init__(self, adj_info, **kwargs):$/;"	m	class:UniformNeighborSampler
+__init__	prediction.py	/^    def __init__(self, input_dim1, input_dim2, placeholders, dropout=False, act=tf.nn.sigmoid,$/;"	m	class:BipartiteEdgePredLayer
+__init__	supervised_models.py	/^    def __init__(self, num_classes,$/;"	m	class:SupervisedGraphsage
+_accuracy	models.py	/^    def _accuracy(self):$/;"	m	class:MLP
+_accuracy	models.py	/^    def _accuracy(self):$/;"	m	class:Model
+_accuracy	models.py	/^    def _accuracy(self):$/;"	m	class:Node2VecModel
+_accuracy	models.py	/^    def _accuracy(self):$/;"	m	class:SampleAndAggregate
+_build	models.py	/^    def _build(self):$/;"	m	class:MLP
+_build	models.py	/^    def _build(self):$/;"	m	class:Model
+_build	models.py	/^    def _build(self):$/;"	m	class:Node2VecModel
+_build	models.py	/^    def _build(self):$/;"	m	class:SampleAndAggregate
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:AttMeanAggregator
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:GCNAggregator
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:MaxPoolingAggregator
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:MeanAggregator
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:MeanPoolingAggregator
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:SeqAggregator
+_call	aggregators.py	/^    def _call(self, inputs):$/;"	m	class:TwoMaxLayerPoolingAggregator
+_call	layers.py	/^    def _call(self, inputs):$/;"	m	class:Dense
+_call	layers.py	/^    def _call(self, inputs):$/;"	m	class:Layer
+_call	neigh_samplers.py	/^    def _call(self, inputs):$/;"	m	class:MLNeighborSampler
+_call	neigh_samplers.py	/^    def _call(self, inputs):$/;"	m	class:UniformNeighborSampler
+_call	neigh_samplers_org.py	/^    def _call(self, inputs):$/;"	m	class:UniformNeighborSampler
+_hinge_loss	prediction.py	/^    def _hinge_loss(self, inputs1, inputs2, neg_samples, hard_neg_samples=None):$/;"	m	class:BipartiteEdgePredLayer
+_log_vars	layers.py	/^    def _log_vars(self):$/;"	m	class:Layer
+_loss	models.py	/^    def _loss(self):$/;"	m	class:MLP
+_loss	models.py	/^    def _loss(self):$/;"	m	class:Model
+_loss	models.py	/^    def _loss(self):$/;"	m	class:Node2VecModel
+_loss	models.py	/^    def _loss(self):$/;"	m	class:SampleAndAggregate
+_loss	supervised_models.py	/^    def _loss(self):$/;"	m	class:SupervisedGraphsage
+_make_label_vec	minibatch.py	/^    def _make_label_vec(self, node):$/;"	m	class:NodeMinibatchIterator
+_minimize	models.py	/^    def _minimize(self):$/;"	m	class:Node2VecModel
+_n2v_prune	minibatch.py	/^    def _n2v_prune(self, edges):$/;"	m	class:EdgeMinibatchIterator
+_remove_isolated	minibatch.py	/^    def _remove_isolated(self, edge_list):$/;"	m	class:EdgeMinibatchIterator
+_skipgram_loss	prediction.py	/^    def _skipgram_loss(self, inputs1, inputs2, neg_samples, hard_neg_samples=None):$/;"	m	class:BipartiteEdgePredLayer
+_xent_loss	prediction.py	/^    def _xent_loss(self, inputs1, inputs2, neg_samples, hard_neg_samples=None):$/;"	m	class:BipartiteEdgePredLayer
+affinity	prediction.py	/^    def affinity(self, inputs1, inputs2):$/;"	m	class:BipartiteEdgePredLayer
+aggregate	models.py	/^    def aggregate(self, samples, input_features, dims, num_samples, support_sizes, attentions, batch_size=None,$/;"	m	class:SampleAndAggregate
+batch_feed_dict	minibatch.py	/^    def batch_feed_dict(self, batch_edges):$/;"	m	class:EdgeMinibatchIterator
+batch_feed_dict	minibatch.py	/^    def batch_feed_dict(self, batch_nodes, val=False):$/;"	m	class:NodeMinibatchIterator
+build	models.py	/^    def build(self):$/;"	m	class:GeneralizedModel
+build	models.py	/^    def build(self):$/;"	m	class:Model
+build	models.py	/^    def build(self):$/;"	m	class:Node2VecModel
+build	models.py	/^    def build(self):$/;"	m	class:SampleAndAggregate
+build	supervised_models.py	/^    def build(self):$/;"	m	class:SupervisedGraphsage
+calc_f1	supervised_test.py	/^def calc_f1(y_true, y_pred):$/;"	f
+calc_f1	supervised_train.py	/^def calc_f1(y_true, y_pred):$/;"	f
+calc_f1	supervised_train_.py	/^def calc_f1(y_true, y_pred):$/;"	f
+construct_adj	minibatch.py	/^    def construct_adj(self):$/;"	m	class:EdgeMinibatchIterator
+construct_adj	minibatch.py	/^    def construct_adj(self):$/;"	m	class:NodeMinibatchIterator
+construct_placeholders	supervised_test.py	/^def construct_placeholders(num_classes):$/;"	f
+construct_placeholders	supervised_train.py	/^def construct_placeholders(num_classes):$/;"	f
+construct_placeholders	supervised_train_.py	/^def construct_placeholders(num_classes):$/;"	f
+construct_placeholders	unsupervised_train.py	/^def construct_placeholders():$/;"	f
+construct_test_adj	minibatch.py	/^    def construct_test_adj(self):$/;"	m	class:EdgeMinibatchIterator
+construct_test_adj	minibatch.py	/^    def construct_test_adj(self):$/;"	m	class:NodeMinibatchIterator
+division	__init__.py	/^from __future__ import division$/;"	i
+division	layers.py	/^from __future__ import division$/;"	i
+division	minibatch.py	/^from __future__ import division$/;"	i
+division	neigh_samplers.py	/^from __future__ import division$/;"	i
+division	neigh_samplers_org.py	/^from __future__ import division$/;"	i
+division	prediction.py	/^from __future__ import division$/;"	i
+division	supervised_test.py	/^from __future__ import division$/;"	i
+division	supervised_train.py	/^from __future__ import division$/;"	i
+division	supervised_train_.py	/^from __future__ import division$/;"	i
+division	unsupervised_train.py	/^from __future__ import division$/;"	i
+end	minibatch.py	/^    def end(self):$/;"	m	class:EdgeMinibatchIterator
+end	minibatch.py	/^    def end(self):$/;"	m	class:NodeMinibatchIterator
+evaluate	supervised_test.py	/^def evaluate(sess, model, minibatch_iter, size=None):$/;"	f
+evaluate	supervised_train.py	/^def evaluate(sess, model, minibatch_iter, size=None):$/;"	f
+evaluate	supervised_train_.py	/^def evaluate(sess, model, minibatch_iter, size=None):$/;"	f
+evaluate	unsupervised_train.py	/^def evaluate(sess, model, minibatch_iter, size=None):$/;"	f
+flags	layers.py	/^flags = tf.app.flags$/;"	v
+flags	models.py	/^flags = tf.app.flags$/;"	v
+flags	neigh_samplers.py	/^flags = tf.app.flags$/;"	v
+flags	neigh_samplers_org.py	/^flags = tf.app.flags$/;"	v
+flags	prediction.py	/^flags = tf.app.flags$/;"	v
+flags	supervised_models.py	/^flags = tf.app.flags$/;"	v
+flags	supervised_test.py	/^flags = tf.app.flags$/;"	v
+flags	supervised_train.py	/^flags = tf.app.flags$/;"	v
+flags	supervised_train_.py	/^flags = tf.app.flags$/;"	v
+flags	unsupervised_train.py	/^flags = tf.app.flags$/;"	v
+get_layer_uid	layers.py	/^def get_layer_uid(layer_name=''):$/;"	f
+glorot	aggregators.py	/^from .inits import glorot, zeros$/;"	i
+glorot	inits.py	/^def glorot(shape, name=None):$/;"	f
+graph_file	utils.py	/^    graph_file = sys.argv[1]$/;"	v
+graphsage	models.py	/^import graphsage.layers as layers$/;"	i
+graphsage	models.py	/^import graphsage.metrics as metrics$/;"	i
+graphsage	supervised_models.py	/^import graphsage.layers as layers$/;"	i
+graphsage	supervised_models.py	/^import graphsage.models as models$/;"	i
+incremental_embed_feed_dict	minibatch.py	/^    def incremental_embed_feed_dict(self, size, iter_num):$/;"	m	class:EdgeMinibatchIterator
+incremental_embed_feed_dict	minibatch.py	/^    def incremental_embed_feed_dict(self, size, iter_num):$/;"	m	class:NodeMinibatchIterator
+incremental_evaluate	supervised_test.py	/^def incremental_evaluate(sess, model, minibatch_iter, size, test=False):$/;"	f
+incremental_evaluate	supervised_train.py	/^def incremental_evaluate(sess, model, minibatch_iter, size, test=False):$/;"	f
+incremental_evaluate	supervised_train_.py	/^def incremental_evaluate(sess, model, minibatch_iter, size, test=False):$/;"	f
+incremental_evaluate	unsupervised_train.py	/^def incremental_evaluate(sess, model, minibatch_iter, size):$/;"	f
+incremental_node_val_feed_dict	minibatch.py	/^    def incremental_node_val_feed_dict(self, size, iter_num, test=False):$/;"	m	class:NodeMinibatchIterator
+incremental_val_feed_dict	minibatch.py	/^    def incremental_val_feed_dict(self, size, iter_num):$/;"	m	class:EdgeMinibatchIterator
+json	utils.py	/^import json$/;"	i
+json_graph	utils.py	/^from networkx.readwrite import json_graph$/;"	i
+label_val	minibatch.py	/^    def label_val(self):$/;"	m	class:EdgeMinibatchIterator
+layers	models.py	/^import graphsage.layers as layers$/;"	i
+layers	supervised_models.py	/^import graphsage.layers as layers$/;"	i
+load	models.py	/^    def load(self, sess=None):$/;"	m	class:Model
+load_data	supervised_test.py	/^from graphsage.utils import load_data$/;"	i
+load_data	supervised_train.py	/^from graphsage.utils import load_data$/;"	i
+load_data	supervised_train_.py	/^from graphsage.utils import load_data$/;"	i
+load_data	unsupervised_train.py	/^from graphsage.utils import load_data$/;"	i
+load_data	utils.py	/^def load_data(prefix, normalize=True, load_walks=False):$/;"	f
+log_dir	supervised_test.py	/^def log_dir():$/;"	f
+log_dir	supervised_train.py	/^def log_dir(sampler_model_name):$/;"	f
+log_dir	supervised_train_.py	/^def log_dir(sampler_model_name):$/;"	f
+log_dir	unsupervised_train.py	/^def log_dir():$/;"	f
+loss	prediction.py	/^    def loss(self, inputs1, inputs2, neg_samples):$/;"	m	class:BipartiteEdgePredLayer
+main	supervised_test.py	/^def main(argv=None):$/;"	f
+main	supervised_train.py	/^def main(argv=None):$/;"	f
+main	supervised_train_.py	/^def main(argv=None):$/;"	f
+main	unsupervised_train.py	/^def main(argv=None):$/;"	f
+major	utils.py	/^major = version_info[0]$/;"	v
+masked_accuracy	metrics.py	/^def masked_accuracy(preds, labels, mask):$/;"	f
+masked_l2	metrics.py	/^def masked_l2(preds, actuals, mask):$/;"	f
+masked_logit_cross_entropy	metrics.py	/^def masked_logit_cross_entropy(preds, labels, mask):$/;"	f
+masked_softmax_cross_entropy	metrics.py	/^def masked_softmax_cross_entropy(preds, labels, mask):$/;"	f
+math	models.py	/^import math$/;"	i
+matplotlib	supervised_train.py	/^import matplotlib.pyplot as plt$/;"	i
+matplotlib	supervised_train_.py	/^import matplotlib.pyplot as plt$/;"	i
+metrics	models.py	/^import graphsage.metrics as metrics$/;"	i
+metrics	supervised_test.py	/^from sklearn import metrics$/;"	i
+metrics	supervised_train.py	/^from sklearn import metrics$/;"	i
+metrics	supervised_train_.py	/^from sklearn import metrics$/;"	i
+minor	utils.py	/^minor = version_info[1]$/;"	v
+models	supervised_models.py	/^import graphsage.models as models$/;"	i
+namedtuple	models.py	/^from collections import namedtuple$/;"	i
+neg_cost	prediction.py	/^    def neg_cost(self, inputs1, neg_samples, hard_neg_samples=None):$/;"	m	class:BipartiteEdgePredLayer
+next_minibatch_feed_dict	minibatch.py	/^    def next_minibatch_feed_dict(self):$/;"	m	class:EdgeMinibatchIterator
+next_minibatch_feed_dict	minibatch.py	/^    def next_minibatch_feed_dict(self):$/;"	m	class:NodeMinibatchIterator
+node_val_feed_dict	minibatch.py	/^    def node_val_feed_dict(self, size=None, test=False):$/;"	m	class:NodeMinibatchIterator
+nodes	utils.py	/^    nodes = [n for n in G.nodes() if not G.node[n]["val"] and not G.node[n]["test"]]$/;"	v
+np	inits.py	/^import numpy as np$/;"	i
+np	minibatch.py	/^import numpy as np$/;"	i
+np	neigh_samplers.py	/^import numpy as np$/;"	i
+np	supervised_models.py	/^import numpy as np$/;"	i
+np	supervised_test.py	/^import numpy as np$/;"	i
+np	supervised_train.py	/^import numpy as np$/;"	i
+np	supervised_train_.py	/^import numpy as np$/;"	i
+np	unsupervised_train.py	/^import numpy as np$/;"	i
+np	utils.py	/^import numpy as np$/;"	i
+num_training_batches	minibatch.py	/^    def num_training_batches(self):$/;"	m	class:EdgeMinibatchIterator
+num_training_batches	minibatch.py	/^    def num_training_batches(self):$/;"	m	class:NodeMinibatchIterator
+nx	utils.py	/^import networkx as nx$/;"	i
+ones	inits.py	/^def ones(shape, name=None):$/;"	f
+os	supervised_test.py	/^import os$/;"	i
+os	supervised_train.py	/^import os$/;"	i
+os	supervised_train_.py	/^import os$/;"	i
+os	unsupervised_train.py	/^import os$/;"	i
+os	utils.py	/^import os$/;"	i
+out_file	utils.py	/^    out_file = sys.argv[2]$/;"	v
+pairs	utils.py	/^    pairs = run_random_walks(G, nodes)$/;"	v
+pdb	models.py	/^import pdb$/;"	i
+pdb	neigh_samplers.py	/^import pdb$/;"	i
+pdb	supervised_train.py	/^import pdb$/;"	i
+pdb	supervised_train_.py	/^import pdb$/;"	i
+plt	supervised_train.py	/^import matplotlib.pyplot as plt$/;"	i
+plt	supervised_train_.py	/^import matplotlib.pyplot as plt$/;"	i
+predict	models.py	/^    def predict(self):$/;"	m	class:MLP
+predict	models.py	/^    def predict(self):$/;"	m	class:Model
+predict	supervised_models.py	/^    def predict(self):$/;"	m	class:SupervisedGraphsage
+print_function	__init__.py	/^from __future__ import print_function$/;"	i
+print_function	layers.py	/^from __future__ import print_function$/;"	i
+print_function	minibatch.py	/^from __future__ import print_function$/;"	i
+print_function	neigh_samplers.py	/^from __future__ import print_function$/;"	i
+print_function	neigh_samplers_org.py	/^from __future__ import print_function$/;"	i
+print_function	prediction.py	/^from __future__ import print_function$/;"	i
+print_function	supervised_test.py	/^from __future__ import print_function$/;"	i
+print_function	supervised_train.py	/^from __future__ import print_function$/;"	i
+print_function	supervised_train_.py	/^from __future__ import print_function$/;"	i
+print_function	unsupervised_train.py	/^from __future__ import print_function$/;"	i
+print_function	utils.py	/^from __future__ import print_function$/;"	i
+random	utils.py	/^import random$/;"	i
+run_random_walks	unsupervised_train.py	/^            from graphsage.utils import run_random_walks$/;"	i
+run_random_walks	utils.py	/^def run_random_walks(G, nodes, num_walks=N_WALKS):$/;"	f
+sample	models.py	/^    def sample(self, inputs, layer_infos, batch_size=None):$/;"	m	class:SampleAndAggregate
+sampler_log_dir	supervised_train.py	/^def sampler_log_dir():$/;"	f
+sampler_log_dir	supervised_train_.py	/^def sampler_log_dir():$/;"	f
+save	models.py	/^    def save(self, sess=None):$/;"	m	class:Model
+save_val_embeddings	unsupervised_train.py	/^def save_val_embeddings(sess, model, minibatch_iter, size, out_dir, mod=""):$/;"	f
+seed	supervised_test.py	/^seed = 123$/;"	v
+seed	supervised_train.py	/^seed = 123$/;"	v
+seed	supervised_train_.py	/^seed = 123$/;"	v
+seed	unsupervised_train.py	/^seed = 123$/;"	v
+shuffle	minibatch.py	/^    def shuffle(self):$/;"	m	class:EdgeMinibatchIterator
+shuffle	minibatch.py	/^    def shuffle(self):$/;"	m	class:NodeMinibatchIterator
+sklearn	supervised_test.py	/^import sklearn$/;"	i
+sklearn	supervised_train.py	/^import sklearn$/;"	i
+sklearn	supervised_train_.py	/^import sklearn$/;"	i
+sparse	supervised_train.py	/^from scipy import sparse $/;"	i
+sparse	supervised_train_.py	/^from scipy import sparse $/;"	i
+sparse_loss_to_node	supervised_models.py	/^    def sparse_loss_to_node(self, samples, support_size, num_samples):$/;"	m	class:SupervisedGraphsage
+sys	utils.py	/^import sys$/;"	i
+test	supervised_test.py	/^def test(train_data, test_data=None):$/;"	f
+tf	aggregators.py	/^import tensorflow as tf$/;"	i
+tf	inits.py	/^import tensorflow as tf$/;"	i
+tf	layers.py	/^import tensorflow as tf$/;"	i
+tf	metrics.py	/^import tensorflow as tf$/;"	i
+tf	models.py	/^import tensorflow as tf$/;"	i
+tf	neigh_samplers.py	/^import tensorflow as tf$/;"	i
+tf	neigh_samplers_org.py	/^import tensorflow as tf$/;"	i
+tf	prediction.py	/^import tensorflow as tf$/;"	i
+tf	supervised_models.py	/^import tensorflow as tf$/;"	i
+tf	supervised_test.py	/^import tensorflow as tf$/;"	i
+tf	supervised_train.py	/^import tensorflow as tf$/;"	i
+tf	supervised_train_.py	/^import tensorflow as tf$/;"	i
+tf	unsupervised_train.py	/^import tensorflow as tf$/;"	i
+time	supervised_test.py	/^import time$/;"	i
+time	supervised_train.py	/^import time$/;"	i
+time	supervised_train_.py	/^import time$/;"	i
+time	unsupervised_train.py	/^import time$/;"	i
+train	supervised_train.py	/^def train(train_data, test_data=None, sampler_name='Uniform'):$/;"	f
+train	supervised_train_.py	/^def train(train_data, test_data=None, sampler_name='Uniform'):$/;"	f
+train	unsupervised_train.py	/^def train(train_data, test_data=None):$/;"	f
+train_sampler	supervised_train.py	/^def train_sampler(train_data):$/;"	f
+train_sampler	supervised_train_.py	/^def train_sampler(train_data):$/;"	f
+uniform	inits.py	/^def uniform(shape, scale=0.05, name=None):$/;"	f
+val_feed_dict	minibatch.py	/^    def val_feed_dict(self, size=None):$/;"	m	class:EdgeMinibatchIterator
+version_info	utils.py	/^version_info = list(map(int, nx.__version__.split('.')))$/;"	v
+weights_norm	prediction.py	/^    def weights_norm(self):$/;"	m	class:BipartiteEdgePredLayer
+zeros	aggregators.py	/^from .inits import glorot, zeros$/;"	i
+zeros	inits.py	/^def zeros(shape, name=None):$/;"	f
+zeros	layers.py	/^from graphsage.inits import zeros$/;"	i
+zeros	prediction.py	/^from graphsage.inits import zeros$/;"	i
