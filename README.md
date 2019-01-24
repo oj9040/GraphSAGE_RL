@@ -40,7 +40,7 @@ You can also run the GPU image using [nvidia-docker](https://github.com/NVIDIA/n
 
 ### Running the code
 
-The example_unsupervised.sh files contain example usages for three dataset (PPI, Reddit, Pubmed) of the code in the supervised classification task.
+The example_unsupervised.sh file contains example usages for three dataset (PPI, Reddit, Pubmed) of the code in the supervised classification task.
 
 If your benchmark/task does not require generalizing to unseen data, we recommend you try setting the "--identity_dim" flag to a value in the range [64,256].
 This flag will make the model embed unique node ids as attributes, which will increase the runtime and number of parameters but also potentially increase the performance.
@@ -67,9 +67,13 @@ you can use the `run_walks` function in `graphsage.utils`.
 #### Dataset Download
 Below dataset are not included in github due to big size, but can be downloaded from links
 PPI (Protein-Protein Interaction)
+
     $ wget http://snap.stanford.edu/graphsage/ppi.zip
+
 Reddit
+
     $ wget http://snap.stanford.edu/graphsage/reddit.zip
+
 
 Pubmed is included in ./data/pubmed folder
 
