@@ -1,11 +1,13 @@
-## GraphSAGE_RL: Learning Node Sampling for Efficient and Scalable Graph Neural Network
+## GraphSAGE_RL: 
+
+Learning Node Sampling for Efficient and Scalable Graph Neural Network
 
 #### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jo1443@nyu.edu), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
 
 ### Overview
 
-This work is an improved version of [GraphSAGE] (https://github.com/williamleif/GraphSAGE)
+This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE)
 
 The default uniform sampling of GraphSAGE suffers from high variance in training, leading to sub-optimum in accuracy.
 
@@ -66,6 +68,7 @@ you can use the `run_walks` function in `graphsage.utils`.
 
 #### Dataset Download
 Below dataset are not included in github due to big size, but can be downloaded from links
+
 PPI (Protein-Protein Interaction)
 
     $ wget http://snap.stanford.edu/graphsage/ppi.zip
