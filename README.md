@@ -2,12 +2,12 @@
 
 Learning Node Sampling for Efficient and Scalable Graph Neural Network
 
-#### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jo1443@nyu.edu), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
+#### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
 
 ### Overview
 
-This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE)
+This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE).
 
 The default uniform sampling of GraphSAGE suffers from high variance in training, leading to sub-optimum in accuracy.
 
