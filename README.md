@@ -79,6 +79,7 @@ Reddit
 
 
 Pubmed is included in ./data/pubmed folder
+For the dataset with different format, convert it using create_Graph_forGraphSAGE.py.
 
 
 #### Model variants
