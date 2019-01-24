@@ -1,37 +1,16 @@
-## GraphSage: Representation Learning on Large Graphs
+## GraphSAGE_RL: Learning Node Sampling for Efficient and Scalable Graph Neural Network
 
-#### Authors: [William L. Hamilton](http://stanford.edu/~wleif) (wleif@stanford.edu), [Rex Ying](http://joy-of-thinking.weebly.com/) (rexying@stanford.edu)
-#### [Project Website](http://snap.stanford.edu/graphsage/)
+#### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jo1443@nyu.edu), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
-#### [Alternative reference PyTorch implementation](https://github.com/williamleif/graphsage-simple/)
 
 ### Overview
 
-This directory contains code necessary to run the GraphSage algorithm.
-GraphSage can be viewed as a stochastic generalization of graph convolutions, and it is especially useful for massive, dynamic graphs that contain rich feature information.
-See our [paper](https://arxiv.org/pdf/1706.02216.pdf) for details on the algorithm.
+This work is an improved version of [GraphSAGE] (https://github.com/williamleif/GraphSAGE)
 
-*Note:* GraphSage now also has better support for training on smaller, static graphs and graphs that don't have node features.
-The original algorithm and paper are focused on the task of inductive generalization (i.e., generating embeddings for nodes that were not present during training),
-but many benchmarks/tasks use simple static graphs that do not necessarily have features.
-To support this use case, GraphSage now includes optional "identity features" that can be used with or without other node attributes.
-Including identity features will increase the runtime, but also potentially increase performance (at the usual risk of overfitting).
-See the section on "Running the code" below.
+The default uniform sampling of GraphSAGE suffers from high variance in training, leading to sub-optimum in accuracy.
 
-*Note:* GraphSage is intended for use on large graphs (>100,000) nodes. The overhead of subsampling will start to outweigh its benefits on smaller graphs. 
+We propose a new sampling approach to reason the real-valued connectivity strength between nodes by a non-linear regressor and to use the value as a criterion for subsampling neighborhoods. The regressor is learned using value-based reinforcement learning concept. The implied connectivity strength for each combination of vertex and neighbor is inductively extracted from the negative of classification loss output of GNN in the pre-training with random sampling. Moreover, multi-hop rewards from auxiliary classifiers added at intermediate layers gradually influence on the value function. Then, the non-linear regressor designed with the exponential of a single perceptron is trained using the extracted values and nodes’ attributes. The high complexity of sorting the regressor’s outputs in testing is minimized by replacing with grouped argmax operation, leading to a half reduction in complexity. As a result, in the inductive node classification benchmark using three datasets, our method enhanced the baseline using the uniform sampling by 12.6% at the best and outperformed the cutting-edge methods.
 
-The example_data subdirectory contains a small example of the protein-protein interaction data,
-which includes 3 training graphs + one validation graph and one test graph.
-The full Reddit and PPI datasets (described in the paper) are available on the [project website](http://snap.stanford.edu/graphsage/).
-
-If you make use of this code or the GraphSage algorithm in your work, please cite the following paper:
-
-     @inproceedings{hamilton2017inductive,
-	     author = {Hamilton, William L. and Ying, Rex and Leskovec, Jure},
-	     title = {Inductive Representation Learning on Large Graphs},
-	     booktitle = {NIPS},
-	     year = {2017}
-	   }
 
 ### Requirements
 
@@ -61,15 +40,12 @@ You can also run the GPU image using [nvidia-docker](https://github.com/NVIDIA/n
 
 ### Running the code
 
-The example_unsupervised.sh and example_supervised.sh files contain example usages of the code, which use the unsupervised and supervised variants of GraphSage, respectively.
+The example_unsupervised.sh files contain example usages for three dataset (PPI, Reddit, Pubmed) of the code in the supervised classification task.
 
 If your benchmark/task does not require generalizing to unseen data, we recommend you try setting the "--identity_dim" flag to a value in the range [64,256].
 This flag will make the model embed unique node ids as attributes, which will increase the runtime and number of parameters but also potentially increase the performance.
 Note that you should set this flag and *not* try to pass dense one-hot vectors as features (due to sparsity).
 The "dimension" of identity features specifies how many parameters there are per node in the sparse identity-feature lookup table.
-
-Note that example_unsupervised.sh sets a very small max iteration number, which can be increased to improve performance.
-We generally found that performance continued to improve even after the loss was very near convergence (i.e., even when the loss was decreasing at a very slow rate).
 
 *Note:* For the PPI data, and any other multi-ouput dataset that allows individual nodes to belong to multiple classes, it is necessary to set the `--sigmoid` flag during supervised training. By default the model assumes that the dataset is in the "one-hot" categorical setting.
 
@@ -87,9 +63,21 @@ To run the model on a new dataset, you need to make data files in the format des
 To run random walks for the unsupervised model and to generate the <prefix>-walks.txt file)
 you can use the `run_walks` function in `graphsage.utils`.
 
+
+#### Dataset Download
+Below dataset are not included in github due to big size, but can be downloaded from links
+PPI (Protein-Protein Interaction)
+    $ wget http://snap.stanford.edu/graphsage/ppi.zip
+Reddit
+    $ wget http://snap.stanford.edu/graphsage/reddit.zip
+
+Pubmed is included in ./data/pubmed folder
+
+
 #### Model variants
 The user must also specify a --model, the variants of which are described in detail in the paper:
-* graphsage_mean -- GraphSage with mean-based aggregator
+* mean_concat -- GraphSage with mean-concat based aggregator
+* mean_add -- GraphSage with mean-add based aggregator (default)
 * graphsage_seq -- GraphSage with LSTM-based aggregator
 * graphsage_maxpool -- GraphSage with max-pooling aggregator (as described in the NIPS 2017 paper)
 * graphsage_meanpool -- GraphSage with mean-pooling aggregator (a variant of the pooling aggregator, where the element-wie mean replaces the element-wise max).
@@ -104,15 +92,4 @@ The supervised model will output F1 scores, while the unsupervised model will tr
 The unsupervised embeddings will be stored in a numpy formated file named val.npy with val.txt specifying the order of embeddings as a per-line list of node ids.
 Note that the full log outputs and stored embeddings can be 5-10Gb in size (on the full data when running with the unsupervised variant).
 
-#### Using the output of the unsupervised models
 
-The unsupervised variants of GraphSage will output embeddings to the logging directory as described above.
-These embeddings can then be used in downstream machine learning applications.
-The `eval_scripts` directory contains examples of feeding the embeddings into simple logistic classifiers.
-
-#### Acknowledgements
-
-The original version of this code base was originally forked from https://github.com/tkipf/gcn/, and we owe many thanks to Thomas Kipf for making his code available.
-We also thank Yuanfang Li and Xin Li who contributed to a course project that was based on this work.
-Please see the [paper](https://arxiv.org/pdf/1706.02216.pdf) for funding details and additional (non-code related) acknowledgements.
-# GraphSAGE_RL
