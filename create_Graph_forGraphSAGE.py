@@ -8,7 +8,6 @@ from utils import *
 import json
 from networkx.readwrite import json_graph
 
-import pdb
 
 
  # 'cora', 'citeseer', 'pubmed'
