@@ -1,6 +1,6 @@
-## GraphSAGE_RL: 
+## GraphSAGE_RL (GraphSAGE + Reinforcement Learning-based Node Sampling)
 
-Learning Node Sampling for Efficient and Scalable Graph Neural Network
+Learning Node Sampling for an Efficient and Scalable Graph Neural Network
 
 #### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
@@ -9,10 +9,33 @@ Learning Node Sampling for Efficient and Scalable Graph Neural Network
 
 This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE).
 
-The default uniform sampling of GraphSAGE suffers from high variance in training, leading to sub-optimum in accuracy.
-
-We propose a new sampling approach to reason the real-valued connectivity strength between nodes by a non-linear regressor and to use the value as a criterion for subsampling neighborhoods. The regressor is learned using value-based reinforcement learning concept. The implied connectivity strength for each combination of vertex and neighbor is inductively extracted from the negative of classification loss output of GNN in the pre-training with random sampling. Moreover, multi-hop rewards from auxiliary classifiers added at intermediate layers gradually influence on the value function. Then, the non-linear regressor designed with the exponential of a single perceptron is trained using the extracted values and nodes’ attributes. The high complexity of sorting the regressor’s outputs in testing is minimized by replacing with grouped argmax operation, leading to a half reduction in complexity. As a result, in the inductive node classification benchmark using three datasets, our method enhanced the baseline using the uniform sampling by 12.6% at the best and outperformed the cutting-edge methods.
-
+Large-scale graph data with sparse connectivity becomes prevalent
+in a wide spectrum of areas, fromweb community detection through
+to biological or physical discovery. As an efficient and scalable graph
+neural network, GraphSAGE has enabled an inductive capability for
+inferring unseen nodes or graphs by aggregating subsampled local
+neighborhoods and by learning in a mini-batch gradient descent
+fashion. This neighborhood sampling is also fascinating in order
+to improve computing and memory efficiency when inferring a
+batch of target nodes with diverse degrees in parallel. Despite these
+advantages, the default uniform sampling suffers from high variance
+in training and inference, leading to sub-optimum accuracy.
+We propose a new data-driven sampling approach to reason
+about the real-valued importance of a neighborhood by a nonlinear
+regressor, and to use the value as a criterion for subsampling
+neighborhoods. The regressor is learned using a value-based
+reinforcement learning. The implied importance for each combination
+of vertex and neighborhood is inductively extracted from
+the negative classification loss output of GraphSAGE. Moreover,
+multi-hop rewards from auxiliary classifiers added at intermediate
+layers gradually influence the value function. Then, a non-linear
+regressor is trained using the extracted values and nodes’ attributes.
+The high complexity of sorting the regressor’s output in testing is
+minimized by replacing it with a grouped argmax operation, leading
+to a two-fold reduction in complexity. As a result, in an inductive
+node classification benchmark using three datasets, our method
+enhanced the baseline using the uniform sampling by 12.6% at best,
+outperforming recent variants of a graph neural network.
 
 ### Requirements
 
