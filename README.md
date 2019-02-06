@@ -1,16 +1,13 @@
 ## GraphSAGE_RL (GraphSAGE + Reinforcement Learning-based Node Sampling)
 
-Learning Node Sampling for an Efficient and Scalable Graph Neural Network
-
 #### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
-
 
 ### Overview
 
 This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE).
 
 Large-scale graph data with sparse connectivity becomes prevalent
-in a wide spectrum of areas, fromweb community detection through
+in a wide spectrum of areas, from web community detection through
 to biological or physical discovery. As an efficient and scalable graph
 neural network, GraphSAGE has enabled an inductive capability for
 inferring unseen nodes or graphs by aggregating subsampled local
