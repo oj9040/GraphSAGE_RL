@@ -38,10 +38,14 @@ flags.DEFINE_float('learning_rate', 0.01, 'initial learning rate.')
 flags.DEFINE_string("model_size", "small", "Can be big or small; model specific def'ns")
 flags.DEFINE_string('train_prefix', '', 'prefix identifying training data. must be specified.')
 flags.DEFINE_string('model_prefix', '', 'model idx.')
+flags.DEFINE_string('hyper_prefix', '', 'hyper idx.')
+
 
 # sampler param
 flags.DEFINE_boolean('nonlinear_sampler', True, 'Whether to use nonlinear sampler o.w. linear sampler')
 flags.DEFINE_boolean('fast_ver', False, 'Whether to use a fast version of nonlinear_sampler')
+flags.DEFINE_boolean('allhop_rewards', False, 'Whether to use a all-hop rewards or last-hop reward for training nonlinear_sampler')
+
 
 # left to default values in main experiments 
 flags.DEFINE_integer('epochs', 10, 'number of epochs to train.')
@@ -71,6 +75,19 @@ flags.DEFINE_boolean('timeline', False, 'export timeline')
 os.environ["CUDA_VISIBLE_DEVICES"]=str(FLAGS.gpu)
 
 GPU_MEM_FRACTION = 0.8
+
+def model_prefix():
+    model_prefix = 'f' + str(FLAGS.dim_1) + '_' + str(FLAGS.dim_2) + '_' + str(FLAGS.dim_3) + '-s' + str(FLAGS.samples_1) + '_' + str(FLAGS.samples_2) + '_' + str(FLAGS.samples_3) 
+    return model_prefix
+
+def hyper_prefix():
+    hyper_prefix = "/{model:s}-{model_size:s}-lr{lr:0.4f}-bs{batch_size:d}-ep{epochs:d}/".format(
+            model=FLAGS.model,
+            model_size=FLAGS.model_size,
+            lr=FLAGS.learning_rate,
+            batch_size=FLAGS.batch_size,
+            epochs=FLAGS.epochs)
+    return hyper_prefix
 
 # calculate only micro f1 score
 def calc_f1(y_true, y_pred):
@@ -118,21 +135,19 @@ def evaluate(sess, model, minibatch_iter, size=None):
 '''
 
 def log_dir(sampler_model_name):
-    log_dir = FLAGS.base_log_dir + "/output/sup-" + FLAGS.train_prefix.split("/")[-2] + '-' + FLAGS.model_prefix + '-' + sampler_model_name
-    log_dir += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
+    log_dir = FLAGS.base_log_dir + "/output/sup-" + FLAGS.train_prefix.split("/")[-2] + '-' + model_prefix() + '-' + str(sampler_model_name)
+
+    log_dir += hyper_prefix()
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     return log_dir
 
 def sampler_log_dir():
-    log_dir = FLAGS.base_log_dir + "/output/sampler-sup-" + FLAGS.train_prefix.split("/")[-2] + '-' + FLAGS.model_prefix
-    log_dir += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
+    log_dir = FLAGS.base_log_dir + "/output/sampler-sup-" + FLAGS.train_prefix.split("/")[-2] + '-' + model_prefix()
+   
+    log_dir += hyper_prefix()
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     return log_dir
@@ -631,15 +646,12 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
     # Save model
     model_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
     saver = tf.train.Saver(var_list=model_vars)
-    model_path =  './model/' + FLAGS.train_prefix.split('/')[-1] + '-' + FLAGS.model_prefix + '-' + sampler_name
-    model_path += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
 
+    model_path = './model/' + FLAGS.train_prefix.split("/")[-1] + '-' + model_prefix() + '-' + sampler_name
+    model_path += hyper_prefix()
+    
     if not os.path.exists(model_path):
         os.makedirs(model_path)
-
 
     # Init variables
     sess.run(tf.global_variables_initializer(), feed_dict={adj_info_ph: minibatch.adj})
@@ -650,12 +662,14 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
         sampler_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="MLsampler")
         #pdb.set_trace() 
         saver_sampler = tf.train.Saver(var_list=sampler_vars)
-        sampler_model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + FLAGS.model_prefix
-        sampler_model_path += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
-
+        
+        if FLAGS.allhop_rewards:
+            sampler_model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-allhops'
+        else:
+            sampler_model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-lasthop'
+        
+        sampler_model_path += hyper_prefix()
+        
         saver_sampler.restore(sess, sampler_model_path + 'model.ckpt')
 
     # Train model
@@ -780,11 +794,9 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
 
 
     # Save loss node and count
-    loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + FLAGS.model_prefix + '-' + sampler_name
-    loss_node_path += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
+    loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-' + sampler_name
+    loss_node_path += hyper_prefix()
+    
     if not os.path.exists(loss_node_path):
         os.makedirs(loss_node_path)
 
@@ -984,7 +996,47 @@ def train_sampler(train_data):
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
 
-    #'''
+
+    if FLAGS.allhop_rewards:
+        
+        dims = [FLAGS.dim_1, FLAGS.dim_2, FLAGS.dim_3]    
+        samples = [FLAGS.samples_1, FLAGS.samples_2, FLAGS.samples_3]
+
+        numhop = np.count_nonzero(samples)
+        gamma = 0.9
+        loss_node = 0
+        loss_node_count = 0
+        for i in reversed(range(0, numhop)):
+           
+            model_prefix_ = 'f' + str(dims[0]) + '_' + str(dims[1]) + '_' + str(dims[2]) + '-s' + str(samples[0]) + '_' + str(samples[1]) + '_' + str(samples[2]) 
+
+            # load data
+            loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix_ + '-Uniform'
+            loss_node_path += hyper_prefix()
+            
+            loss_node_perstep = sparse.load_npz(loss_node_path + 'loss_node.npz')
+            loss_node_count_perstep = sparse.load_npz(loss_node_path + 'loss_node_count.npz')
+ 
+            loss_node += (gamma**i)*loss_node_perstep
+            loss_node_count += loss_node_count_perstep
+            
+            dims[i] = 0
+            samples[i] = 0
+
+    else:
+        
+        # load data
+        loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-Uniform'
+        loss_node_path += hyper_prefix()
+
+        loss_node = sparse.load_npz(loss_node_path + 'loss_node.npz')
+        loss_node_count = sparse.load_npz(loss_node_path + 'loss_node_count.npz')
+ 
+    
+    idx_nz = sparse.find(loss_node_count)
+ 
+
+    '''
     # load data
     loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + FLAGS.model_prefix + '-Uniform'
     loss_node_path += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
@@ -1002,7 +1054,7 @@ def train_sampler(train_data):
     neighbor = features[idx_nz[1]]
     count = idx_nz[2]
     y = np.divide(sparse.find(loss_node)[2],count)
-    #'''
+    '''
     
     '''
     
@@ -1024,13 +1076,12 @@ def train_sampler(train_data):
     loss_node_count = loss_node_count1 + loss_node_count2 + loss_node_count3
      
     idx_nz = sparse.find(loss_node_count)
-    
-    # due to out of memory, select randomly limited number of data node
+    '''
+
     vertex = features[idx_nz[0]]
     neighbor = features[idx_nz[1]]
     count = idx_nz[2]
     y = np.divide(sparse.find(loss_node)[2],count)
-    '''
    
     # partition train/validation data
     vertex_tr = vertex[:-batch_size]
@@ -1050,15 +1101,14 @@ def train_sampler(train_data):
     merged_summary_op = tf.summary.merge_all()
     summary_writer = tf.summary.FileWriter(sampler_log_dir(), sess.graph)
 
-
     # save model
     saver = tf.train.Saver()
-    model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + FLAGS.model_prefix
-    model_path += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
-
+    if FLAGS.allhop_rewards:
+        model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-allhops'
+    else:
+        model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-lasthop'
+    model_path += hyper_prefix()
+    
     if not os.path.exists(model_path):
         os.makedirs(model_path)
     
@@ -1125,7 +1175,35 @@ def main(argv=None):
     print("Done loading training data..")
 
     print("Start training uniform sampling + graphsage model..")
-    train(train_data, sampler_name='Uniform')
+    if FLAGS.allhop_rewards:
+        
+        dim_2_org = FLAGS.dim_2
+        dim_3_org = FLAGS.dim_3
+        samples_2_org = FLAGS.samples_2
+        samples_3_org = FLAGS.samples_3
+            
+        dims = [FLAGS.dim_1, FLAGS.dim_2, FLAGS.dim_3]
+        samples = [FLAGS.samples_1, FLAGS.samples_2, FLAGS.samples_3]
+        numhop = np.count_nonzero(samples)
+        for i in reversed(range(0, numhop)):
+            
+            FLAGS.dim_2 = dims[1]
+            FLAGS.dim_3 = dims[2]
+            FLAGS.samples_2 = samples[1]
+            FLAGS.samples_3 = samples[2]
+            print ('Obtainining %d/%d hop reward'%(i+1, numhop)) 
+            train(train_data, sampler_name='Uniform')
+            
+            dims[i] = 0
+            samples[i] = 0
+        
+        FLAGS.dim_2 = dim_2_org
+        FLAGS.dim_3 = dim_3_org
+        FLAGS.samples_2 = samples_2_org
+        FLAGS.samples_3 = samples_3_org
+
+    else:
+        train(train_data, sampler_name='Uniform')
     print("Done training uniform sampling + graphsage model..")
 
     ## train sampler
