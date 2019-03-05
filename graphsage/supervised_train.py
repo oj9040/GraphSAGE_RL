@@ -15,6 +15,8 @@ from graphsage.neigh_samplers import UniformNeighborSampler, MLNeighborSampler, 
 from graphsage.utils import load_data
 
 from scipy import sparse 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pdb
 from tensorflow.python.client import timeline
@@ -122,18 +124,6 @@ def evaluate(sess, model, minibatch_iter, size=None):
     
     return node_outs_val[1], mic, mac, (time.time() - t_test)
 
-'''
-def evaluate(sess, model, minibatch_iter, size=None):
-    t_test = time.time()
-    feed_dict_val, labels = minibatch_iter.node_val_feed_dict(size)
-    node_outs_val = sess.run([model.preds, model.loss, model.micro_f1], 
-                        feed_dict=feed_dict_val)
-    #mic, mac = calc_f1(labels, node_outs_val[0])
-    
-    #return node_outs_val[1], mic, mac, (time.time() - t_test)
-    return node_outs_val[1], node_outs_val[2], node_outs_val[2], (time.time()-t_test)
-'''
-
 def log_dir(sampler_model_name):
     log_dir = FLAGS.base_log_dir + "/output/sup-" + FLAGS.train_prefix.split("/")[-2] + '-' + model_prefix() + '-' + str(sampler_model_name)
 
@@ -180,62 +170,6 @@ def incremental_evaluate(sess, model, minibatch_iter, size, run_options=None, ru
 
     return np.mean(val_losses), f1_scores[0], f1_scores[1], (time.time() - t_test)
 
-'''
-def incremental_evaluate(sess, model, minibatch_iter, size, run_options=None, run_metadata=None, test=False):
-    t_test = time.time()
-    finished = False
-    val_losses = []
-    val_preds = []
-    labels = []
-    iter_num = 0
-    finished = False
-    
-    def micro_f1(predicted, labels):
-        
-        predicted = tf.round(predicted)
-
-        # Use integers to avoid any nasty FP behaviour
-        predicted = tf.cast(predicted, dtype=tf.int32)
-        labels = tf.cast(labels, dtype=tf.int32)
-        
-        # Count true positives, true negatives, false positives and false negatives.
-        tp = tf.count_nonzero(predicted * labels)
-        tn = tf.count_nonzero((predicted - 1) * (labels - 1))
-        fp = tf.count_nonzero(predicted * (labels - 1))
-        fn = tf.count_nonzero((predicted - 1) * labels)
-
-        # Calculate accuracy, precision, recall and F1 score.
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-        fmeasure = (2 * precision * recall) / (precision + recall)
-        fmeasure = tf.cast(fmeasure, tf.float32)
-        return fmeasure
-
-    while not finished:
-        feed_dict_val, batch_labels, finished, _  = minibatch_iter.incremental_node_val_feed_dict(size, iter_num, test=test)
-        
-        if feed_dict_val.values()[0] != FLAGS.batch_size:
-            break
-
-        node_outs_val = sess.run([model.preds, model.loss, model.micro_f1], 
-                         feed_dict=feed_dict_val, options=run_options, run_metadata=run_metadata)
-
-        val_preds.append(node_outs_val[0])
-        labels.append(batch_labels)
-        val_losses.append(node_outs_val[1])
-        iter_num += 1
-    val_preds = np.vstack(val_preds)
-    labels = np.vstack(labels)
-    #f1_scores = calc_f1(labels, val_preds)
-
-    preds_ph = tf.placeholder(val_preds.shape, tf.float32)
-    labels_ph = tf.placeholder(labels.shape, tf.float32)
-
-    f1_scores = sess.run(micro_f1, feed_dict={preds_ph:val_preds, labels_ph: labels})
-
-    return np.mean(val_losses), f1_scores, f1_scores, (time.time() - t_test)
-    #return np.mean(val_losses), f1_scores[0], f1_scores[1], (time.time() - t_test)
-'''
 
 def construct_placeholders(num_classes):
     # Define placeholders
@@ -245,10 +179,17 @@ def construct_placeholders(num_classes):
         #'batch' : tf.placeholder(tf.int32, shape=(None), name='batch1'),
         'dropout': tf.placeholder_with_default(0., shape=(), name='dropout'),
         'batch_size' : tf.placeholder(tf.int32, name='batch_size'),
+        'learning_rate': tf.placeholder(tf.float32, name='learning_rate')
     }
     return placeholders
 
 def train(train_data, test_data=None, sampler_name='Uniform'):
+    
+    # Set random seed
+    seed = 123
+    np.random.seed(seed)
+    tf.set_random_seed(seed)
+
 
     G = train_data[0]
     features = train_data[1]
@@ -279,13 +220,7 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
 
     adj_shape = adj_info.get_shape().as_list()
 
-#    loss_node = tf.SparseTensor(indices=np.empty((0,2), dtype=np.int64), values=[], dense_shape=[adj_shape[0], adj_shape[0]])
-#    loss_node_count = tf.SparseTensor(indices=np.empty((0,2), dtype=np.int64), values=[], dense_shape=[adj_shape[0], adj_shape[0]])
-# 
-    # newly added for storing cost in each adj cell
-#    loss_node = tf.Variable(tf.zeros([minibatch.adj.shape[0], minibatch.adj.shape[0]]), trainable=False, name="loss_node", dtype=tf.float32)
-#    loss_node_count = tf.Variable(tf.zeros([minibatch.adj.shape[0], minibatch.adj.shape[0]]), trainable=False, name="loss_node_count", dtype=tf.float32)
-    
+   
     if FLAGS.model == 'mean_concat':
         # Create model
         
@@ -305,20 +240,11 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
                                 SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2)]
         else:
             layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1)]
-        '''        
-        ### 3 layer test
-        layer_infos = [SAGEInfo("node", sampler, 50, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 25, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 10, FLAGS.dim_2)]
- 
-        '''
-        
+       
         # modified
         model = SupervisedGraphsage(num_classes, placeholders, 
                                      features,
                                      adj_info,
-                                     #loss_node,
-                                     #loss_node_count,
                                      minibatch.deg,
                                      layer_infos,
                                      concat=True,
@@ -326,17 +252,8 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
                                      sigmoid_loss = FLAGS.sigmoid,
                                      identity_dim = FLAGS.identity_dim,
                                      logging=True)
-#
-#        model = SupervisedGraphsage(num_classes, placeholders, 
-#                                     features,
-#                                     adj_info,
-#                                     minibatch.deg,
-#                                     layer_infos, 
-#                                     model_size=FLAGS.model_size,
-#                                     sigmoid_loss = FLAGS.sigmoid,
-#                                     identity_dim = FLAGS.identity_dim,
-#                                     logging=True)
 
+    
     elif FLAGS.model == 'mean_add':
         # Create model
         
@@ -356,20 +273,11 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
                                 SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2)]
         else:
             layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1)]
-        '''        
-        ### 3 layer test
-        layer_infos = [SAGEInfo("node", sampler, 50, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 25, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 10, FLAGS.dim_2)]
- 
-        '''
-        
+       
         # modified
         model = SupervisedGraphsage(num_classes, placeholders, 
                                      features,
                                      adj_info,
-                                     #loss_node,
-                                     #loss_node_count,
                                      minibatch.deg,
                                      layer_infos,
                                      concat=False,
@@ -377,165 +285,6 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
                                      sigmoid_loss = FLAGS.sigmoid,
                                      identity_dim = FLAGS.identity_dim,
                                      logging=True)
-#
-#        model = SupervisedGraphsage(num_classes, placeholders, 
-#                                     features,
-#                                     adj_info,
-#                                     minibatch.deg,
-#                                     layer_infos, 
-#                                     model_size=FLAGS.model_size,
-#                                     sigmoid_loss = FLAGS.sigmoid,
-#                                     identity_dim = FLAGS.identity_dim,
-#                                     logging=True)
- 
-    elif FLAGS.model == 'LRmean_add':
-        # Create model
-        
-        if sampler_name == 'Uniform':
-            sampler = UniformNeighborSampler(adj_info)
-        elif sampler_name == 'ML':
-            sampler = MLNeighborSampler(adj_info, features)
-        elif sampler_name == 'FastML':
-            sampler = FastMLNeighborSampler(adj_info, features)
-
-        if FLAGS.samples_3 != 0:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
-                                SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, FLAGS.samples_3, FLAGS.dim_3)]
-        elif FLAGS.samples_2 != 0:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
-                                SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2)]
-        else:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1)]
-        '''        
-        ### 3 layer test
-        layer_infos = [SAGEInfo("node", sampler, 50, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 25, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 10, FLAGS.dim_2)]
- 
-        '''
-        
-        # modified
-        model = SupervisedGraphsage(num_classes, placeholders, 
-                                     features,
-                                     adj_info,
-                                     #loss_node,
-                                     #loss_node_count,
-                                     minibatch.deg,
-                                     layer_infos,
-                                     aggregator_type="LRmean",
-                                     concat=False,
-                                     model_size=FLAGS.model_size,
-                                     sigmoid_loss = FLAGS.sigmoid,
-                                     identity_dim = FLAGS.identity_dim,
-                                     logging=True)
-#
-#        model = SupervisedGraphsage(num_classes, placeholders, 
-#                                     features,
-#                                     adj_info,
-#                                     minibatch.deg,
-#                                     layer_infos, 
-#                                     model_size=FLAGS.model_size,
-#                                     sigmoid_loss = FLAGS.sigmoid,
-#                                     identity_dim = FLAGS.identity_dim,
-#                                     logging=True)
-
-    elif FLAGS.model == 'logicmean':
-        # Create model
-        
-        if sampler_name == 'Uniform':
-            sampler = UniformNeighborSampler(adj_info)
-        elif sampler_name == 'ML':
-            sampler = MLNeighborSampler(adj_info, features)
-        elif sampler_name == 'FastML':
-            sampler = FastMLNeighborSampler(adj_info, features)
-
-
-
-        if FLAGS.samples_3 != 0:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
-                                SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, FLAGS.samples_3, FLAGS.dim_2)]
-        elif FLAGS.samples_2 != 0:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
-                                SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2)]
-        else:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1)]
-        '''        
-        ### 3 layer test
-        layer_infos = [SAGEInfo("node", sampler, 50, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 25, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 10, FLAGS.dim_2)]
- 
-        '''
-        
-        # modified
-        model = SupervisedGraphsage(num_classes, placeholders, 
-                                     features,
-                                     adj_info,
-                                     #loss_node,
-                                     #loss_node_count,
-                                     minibatch.deg,
-                                     layer_infos,
-                                     aggregator_type='logicmean',
-                                     concat = True,
-                                     model_size=FLAGS.model_size,
-                                     sigmoid_loss = FLAGS.sigmoid,
-                                     identity_dim = FLAGS.identity_dim,
-                                     logging=True)
-#
-    elif FLAGS.model == 'attmean':
-        # Create model
-        
-        if sampler_name == 'Uniform':
-            sampler = UniformNeighborSampler(adj_info)
-        elif sampler_name == 'ML':
-            sampler = MLNeighborSampler(adj_info, features)
-        elif sampler_name == 'FastML':
-            sampler = FastMLNeighborSampler(adj_info, features)
-
-
-
-        if FLAGS.samples_3 != 0:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
-                                SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, FLAGS.samples_3, FLAGS.dim_2)]
-        elif FLAGS.samples_2 != 0:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1),
-                                SAGEInfo("node", sampler, FLAGS.samples_2, FLAGS.dim_2)]
-        else:
-            layer_infos = [SAGEInfo("node", sampler, FLAGS.samples_1, FLAGS.dim_1)]
-        '''        
-        ### 3 layer test
-        layer_infos = [SAGEInfo("node", sampler, 50, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 25, FLAGS.dim_2),
-                                SAGEInfo("node", sampler, 10, FLAGS.dim_2)]
- 
-        '''
-        
-        # modified
-        model = SupervisedGraphsage(num_classes, placeholders, 
-                                     features,
-                                     adj_info,
-                                     #loss_node,
-                                     #loss_node_count,
-                                     minibatch.deg,
-                                     layer_infos,
-                                     aggregator_type='attmean',
-                                     model_size=FLAGS.model_size,
-                                     sigmoid_loss = FLAGS.sigmoid,
-                                     identity_dim = FLAGS.identity_dim,
-                                     logging=True)
-#
-#        model = SupervisedGraphsage(num_classes, placeholders, 
-#                                     features,
-#                                     adj_info,
-#                                     minibatch.deg,
-#                                     layer_infos, 
-#                                     model_size=FLAGS.model_size,
-#                                     sigmoid_loss = FLAGS.sigmoid,
-#                                     identity_dim = FLAGS.identity_dim,
-#                                     logging=True)
 
     elif FLAGS.model == 'gcn':
         
@@ -693,97 +442,97 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
     
     ln_acc = ln_acc.tolil()
     lnc_acc = lnc_acc.tolil()
-# 
-#    ln_acc = np.zeros([adj_shape[0], adj_shape[0]])
-#    lnc_acc = np.zeros([adj_shape[0], adj_shape[0]])
 
-
-    for epoch in range(FLAGS.epochs): 
-        
-        epoch_time = time.time()
-            
-        minibatch.shuffle() 
-
-        iter = 0
-        print('Epoch: %04d' % (epoch + 1))
-        epoch_val_costs.append(0)
-        
-        #for j in range(2):
-        while not minibatch.end():
-            # Construct feed dictionary
-            feed_dict, labels = minibatch.next_minibatch_feed_dict()
-            
-
-            if feed_dict.values()[0] != FLAGS.batch_size:
-                break
-            
-
-            feed_dict.update({placeholders['dropout']: FLAGS.dropout})
-
-            t = time.time()
-            # Training step
-            #outs = sess.run([merged, model.opt_op, model.loss, model.preds], feed_dict=feed_dict)
-           
-            outs = sess.run([merged, model.opt_op, model.loss, model.preds, model.loss_node, model.loss_node_count], feed_dict=feed_dict)
-            train_cost = outs[2]
-
-
-            if iter % FLAGS.validate_iter == 0:
-                # Validation
-                sess.run(val_adj_info.op)
-                if FLAGS.validate_batch_size == -1:
-                    val_cost, val_f1_mic, val_f1_mac, duration = incremental_evaluate(sess, model, minibatch, FLAGS.batch_size)
-                else:
-                    val_cost, val_f1_mic, val_f1_mac, duration = evaluate(sess, model, minibatch, FLAGS.validate_batch_size)
-                
-                # accumulate val results
-                val_cost_.append(val_cost)
-                val_f1_mic_.append(val_f1_mic)
-                val_f1_mac_.append(val_f1_mac)
-                duration_.append(duration)
-
-                #
-                sess.run(train_adj_info.op)
-                epoch_val_costs[-1] += val_cost
-
-
-            if total_steps % FLAGS.print_every == 0:
-                summary_writer.add_summary(outs[0], total_steps)
+    #learning_rate = [0.01, 0.001, 0.0001]
+    learning_rate = [FLAGS.learning_rate]
     
-            # Print results
-            avg_time = (avg_time * total_steps + time.time() - t) / (total_steps + 1)
+    for lr_iter in range(len(learning_rate)):
 
+            for epoch in range(FLAGS.epochs): 
+                
+                epoch_time = time.time()
+                    
+                minibatch.shuffle() 
+
+                iter = 0
+                print('Epoch: %04d' % (epoch + 1))
+                epoch_val_costs.append(0)
+                
+                while not minibatch.end():
+                    # Construct feed dictionary
+                    feed_dict, labels = minibatch.next_minibatch_feed_dict()
+                    
+
+                    if feed_dict.values()[0] != FLAGS.batch_size:
+                        break
+                    
+
+                    feed_dict.update({placeholders['dropout']: FLAGS.dropout})
+                    feed_dict.update({placeholders['learning_rate']: learning_rate[lr_iter]})
+
+                    t = time.time()
+                    
+                    # Training step
+                    outs = sess.run([merged, model.opt_op, model.loss, model.preds, model.loss_node, model.loss_node_count], feed_dict=feed_dict)
+                    train_cost = outs[2]
+
+
+                    if iter % FLAGS.validate_iter == 0:
+                        # Validation
+                        sess.run(val_adj_info.op)
+                        if FLAGS.validate_batch_size == -1:
+                            val_cost, val_f1_mic, val_f1_mac, duration = incremental_evaluate(sess, model, minibatch, FLAGS.batch_size)
+                        else:
+                            val_cost, val_f1_mic, val_f1_mac, duration = evaluate(sess, model, minibatch, FLAGS.validate_batch_size)
+                        
+                        # accumulate val results
+                        val_cost_.append(val_cost)
+                        val_f1_mic_.append(val_f1_mic)
+                        val_f1_mac_.append(val_f1_mac)
+                        duration_.append(duration)
+
+                        #
+                        sess.run(train_adj_info.op)
+                        epoch_val_costs[-1] += val_cost
+
+
+                    if total_steps % FLAGS.print_every == 0:
+                        summary_writer.add_summary(outs[0], total_steps)
             
-            ln = outs[4].values
-            ln_idx = outs[4].indices
-            ln_acc[ln_idx[:,0], ln_idx[:,1]] += ln
-           
+                    # Print results
+                    avg_time = (avg_time * total_steps + time.time() - t) / (total_steps + 1)
 
-            lnc = outs[5].values
-            lnc_idx = outs[5].indices
-            lnc_acc[lnc_idx[:,0], lnc_idx[:,1]] += lnc
-           
-            if total_steps % FLAGS.print_every == 0:
-                train_f1_mic, train_f1_mac = calc_f1(labels, outs[3])
-                print("Iter:", '%04d' % iter, 
-                      "train_loss=", "{:.5f}".format(train_cost),
-                      "train_f1_mic=", "{:.5f}".format(train_f1_mic), 
-                      "val_loss=", "{:.5f}".format(val_cost),
-                      "val_f1_mic=", "{:.5f}".format(val_f1_mic), 
-                      "time per iter=", "{:.5f}".format(avg_time))
-               
-            iter += 1
-            total_steps += 1
+                    
+                    ln = outs[4].values
+                    ln_idx = outs[4].indices
+                    ln_acc[ln_idx[:,0], ln_idx[:,1]] += ln
+                   
 
-            if total_steps > FLAGS.max_total_steps:
-                break
+                    lnc = outs[5].values
+                    lnc_idx = outs[5].indices
+                    lnc_acc[lnc_idx[:,0], lnc_idx[:,1]] += lnc
+                   
+                    if total_steps % FLAGS.print_every == 0:
+                        train_f1_mic, train_f1_mac = calc_f1(labels, outs[3])
+                        print("Iter:", '%04d' % iter, 
+                              "train_loss=", "{:.5f}".format(train_cost),
+                              "train_f1_mic=", "{:.5f}".format(train_f1_mic), 
+                              "val_loss=", "{:.5f}".format(val_cost),
+                              "val_f1_mic=", "{:.5f}".format(val_f1_mic), 
+                              "time per iter=", "{:.5f}".format(avg_time))
+                       
+                    iter += 1
+                    total_steps += 1
 
-        epoch_laps = time.time()-epoch_time
-        epoch_laps_.append(epoch_laps)
-        print("Epoch time=", "{:.5f}".format(epoch_laps))
+                    if total_steps > FLAGS.max_total_steps:
+                        break
 
-        if total_steps > FLAGS.max_total_steps:
-                break
+                epoch_laps = time.time()-epoch_time
+                epoch_laps_.append(epoch_laps)
+                print("Epoch time=", "{:.5f}".format(epoch_laps))
+
+                if total_steps > FLAGS.max_total_steps:
+                        break
     
     print("avg time per epoch=", "{:.5f}".format(np.mean(epoch_laps_)))   
 
@@ -804,49 +553,7 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
     loss_node_count = sparse.save_npz(loss_node_path + 'loss_node_count.npz', sparse.csr_matrix(lnc_acc))
     print ('loss and count per node is saved at %s'%loss_node_path)    
  
-#    # save images of loss node and count
-#    plt.imsave(loss_node_path + 'loss_node_mean.png', np.uint8(np.round(np.divide(ln_acc.todense()[:1024,:1024], lnc_acc.todense()[:1024,:1024]+1e-10))), cmap='jet', vmin=0, vmax=255)
-#    plt.imsave(loss_node_path + 'loss_node_count.png', np.uint8(lnc_acc.todense()[:1024,:1024]), cmap='jet', vmin=0, vmax=255)
-#
 
-    '''
-    print("Validation per epoch in training")
-    for ep in range(FLAGS.epochs):
-        print("Epoch: %04d"%ep, " val_cost={:.5f}".format(val_cost_[ep]), " val_f1_mic={:.5f}".format(val_f1_mic_[ep]), " val_f1_mac={:.5f}".format(val_f1_mac_[ep]), " duration={:.5f}".format(duration_[ep]))
-    
-    print("Optimization Finished!")
-    sess.run(val_adj_info.op)
-
-    # full validation 
-    val_cost_ = []
-    val_f1_mic_ = []
-    val_f1_mac_ = []
-    duration_ = []
-    for iter in range(10):
-        val_cost, val_f1_mic, val_f1_mac, duration = incremental_evaluate(sess, model, minibatch, FLAGS.batch_size)
-        print("Full validation stats:",
-                          "loss=", "{:.5f}".format(val_cost),
-                          "f1_micro=", "{:.5f}".format(val_f1_mic),
-                          "f1_macro=", "{:.5f}".format(val_f1_mac),
-                          "time=", "{:.5f}".format(duration))
-
-        val_cost_.append(val_cost)
-        val_f1_mic_.append(val_f1_mic)
-        val_f1_mac_.append(val_f1_mac)
-        duration_.append(duration)
-    
-    print("mean: loss={:.5f} f1_micro={:.5f} f1_macro={:.5f} time={:.5f}\n".format(np.mean(val_cost_), np.mean(val_f1_mic_), np.mean(val_f1_mac_), np.mean(duration_)))
-  
-    # write validation results
-    with open(log_dir(sampler_name) + "val_stats.txt", "w") as fp:
-        for iter in range(10):
-            fp.write("loss={:.5f} f1_micro={:.5f} f1_macro={:.5f} time={:.5f}\n".format(val_cost_[iter], val_f1_mic_[iter], val_f1_mac_[iter], duration_[iter]))
-        
-        fp.write("mean: loss={:.5f} f1_micro={:.5f} f1_macro={:.5f} time={:.5f}\n".format(np.mean(val_cost_), np.mean(val_f1_mic_), np.mean(val_f1_mac_), np.mean(duration_)))
-        fp.write("variance: loss={:.5f} f1_micro={:.5f} f1_macro={:.5f} time={:.5f}\n".format(np.var(val_cost_), np.var(val_f1_mic_), np.var(val_f1_mac_), np.var(duration_)))
-    ''' 
-
-    
     print("Optimization Finished!")
     sess.run(val_adj_info.op)
     
@@ -870,7 +577,6 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
     for iter in range(10):
         
         val_cost, val_f1_mic, val_f1_mac, duration = incremental_evaluate(sess, model, minibatch, FLAGS.batch_size, run_options, run_metadata, test=True)
-        #val_cost, val_f1_mic, val_f1_mac, duration = incremental_evaluate(sess, model, minibatch, FLAGS.batch_size, test=True)
         
         print("Full validation stats:",
                           "loss=", "{:.5f}".format(val_cost),
@@ -911,9 +617,15 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
 
 # Sampler
 def train_sampler(train_data):
+    
+    # Set random seed
+    seed = 123
+    np.random.seed(seed)
+    tf.set_random_seed(seed)
 
     features = train_data[1]
     #batch_size = FLAGS.batch_size
+    epochs = FLAGS.epochs
     batch_size = 512
 
     if not features is None:
@@ -923,19 +635,15 @@ def train_sampler(train_data):
     node_size = len(features)
     node_dim = len(features[0])
    
-    '''
-    # debug
-    if node_dim > 50:
-        features = features[:,:50]
-        node_dim = 50
-    '''
-
     # build model
     # input (features of vertex and its neighbor, label)
     x1_ph = tf.placeholder(shape=[batch_size, node_dim], dtype=tf.float32)
     x2_ph = tf.placeholder(shape=[batch_size, node_dim], dtype=tf.float32) 
     y_ph = tf.placeholder(shape=[batch_size], dtype=tf.float32)
-    
+    lr_ph = tf.placeholder(dtype=tf.float32)
+
+
+    # sampler model (non-linear, linear)
     with tf.variable_scope("MLsampler"):
         
         if FLAGS.nonlinear_sampler == True:
@@ -944,7 +652,6 @@ def train_sampler(train_data):
 
             l = tf.layers.dense(tf.concat([x1_ph, x2_ph], axis=1), 1, activation=tf.nn.relu, trainable=True, kernel_initializer=tf.contrib.layers.xavier_initializer(), name='dense')
       
-            #out = tf.nn.relu(tf.exp(l), name='relu')
             out = tf.exp(l)
 
         else:
@@ -957,53 +664,29 @@ def train_sampler(train_data):
             out = tf.nn.relu(l, name='relu')
         ###
 
+    # l2 loss
     loss = tf.nn.l2_loss(out-y_ph, name='loss')/batch_size
-    
-    '''
-    with tf.variable_scope("MLsampler"):
-        #bias = tf.Variable(tf.zeros([1]), trainable=True, name='bias')
-        # layer 
-        # relu(x1*W*x2)
-       
-        #drop_rate = 0.5
-        #x1_ph = tf.layers.dropout(x1_ph, rate=drop_rate, training=True) 
-        l = tf.layers.dense(x1_ph, node_dim, activation=None, trainable=True, name='dense')
-        #l = tf.nn.relu(l, name='relu')
 
-        #l = tf.layers.dense(l, node_dim, activation=None, trainable=True, name='dense2')
-        #l = tf.nn.relu(l, name='relu')
+    # optimizer
+    optimizer = tf.train.AdamOptimizer(learning_rate=lr_ph, name='Adam').minimize(loss)
 
-        l = tf.matmul(l, x2_ph, transpose_b=True, name='matmul')
-        
-        #l = tf.nn.bias_add(l, tf.tile(bias, [batch_size]))
-        out = tf.nn.relu(l, name='relu')
-        ###
-
-    loss = tf.nn.l2_loss(out-y_ph, name='loss')/batch_size
-    '''
-     
-#    sampler_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="MLsampler")
-#    for var in sampler_vars:
-#        loss += FLAGS.weight_decay * tf.nn.l2_loss(var)
-#
-    
-    optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate, name='Adam').minimize(loss)
+    # initialize global variables
     init = tf.global_variables_initializer()
-
 
     # configuration
     config = tf.ConfigProto(log_device_placement=FLAGS.log_device_placement)
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
 
-
+    # construct reward from loss
     if FLAGS.allhop_rewards:
+        # using all-hop rewards
         
         dims = [FLAGS.dim_1, FLAGS.dim_2, FLAGS.dim_3]    
         samples = [FLAGS.samples_1, FLAGS.samples_2, FLAGS.samples_3]
 
         numhop = np.count_nonzero(samples)
-        gamma = 0.9
+        gamma = 0.1
         loss_node = 0
         loss_node_count = 0
         for i in reversed(range(0, numhop)):
@@ -1016,7 +699,8 @@ def train_sampler(train_data):
             
             loss_node_perstep = sparse.load_npz(loss_node_path + 'loss_node.npz')
             loss_node_count_perstep = sparse.load_npz(loss_node_path + 'loss_node_count.npz')
- 
+
+
             loss_node += (gamma**i)*loss_node_perstep
             loss_node_count += loss_node_count_perstep
             
@@ -1024,6 +708,7 @@ def train_sampler(train_data):
             samples[i] = 0
 
     else:
+        # using only last-hop reward
         
         # load data
         loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-Uniform'
@@ -1031,58 +716,43 @@ def train_sampler(train_data):
 
         loss_node = sparse.load_npz(loss_node_path + 'loss_node.npz')
         loss_node_count = sparse.load_npz(loss_node_path + 'loss_node_count.npz')
- 
-    
-    idx_nz = sparse.find(loss_node_count)
- 
 
-    '''
-    # load data
-    loss_node_path = './loss_node/' + FLAGS.train_prefix.split('/')[-1] + '-' + FLAGS.model_prefix + '-Uniform'
-    loss_node_path += "/{model:s}_{model_size:s}_{lr:0.4f}/".format(
-            model=FLAGS.model,
-            model_size=FLAGS.model_size,
-            lr=FLAGS.learning_rate)
-
-    loss_node = sparse.load_npz(loss_node_path + 'loss_node.npz')
-    loss_node_count = sparse.load_npz(loss_node_path + 'loss_node_count.npz')
- 
-    idx_nz = sparse.find(loss_node_count)
    
-    # due to out of memory, select randomly limited number of data node
-    vertex = features[idx_nz[0]]
-    neighbor = features[idx_nz[1]]
-    count = idx_nz[2]
-    y = np.divide(sparse.find(loss_node)[2],count)
-    '''
-    
-    '''
-    
-    
-    loss_node_path1 = '/home/jo1443/GraphSAGE/loss_node/pubmed-f512_s30-Uniform/mean_concat_small_0.0100i/'
-    loss_node_path2 = '/home/jo1443/GraphSAGE/loss_node/pubmed-f512512_s3030-Uniform/mean_concat_small_0.0100i/'
-    loss_node_path3 = '/home/jo1443/GraphSAGE/loss_node/pubmed-f512512512_s303030-Uniform/mean_concat_small_0.0100i/'
+    cnt_nz = sparse.find(loss_node_count)
+    loss_nz = sparse.find(loss_node)
 
-    loss_node1 = sparse.load_npz(loss_node_path1 + 'loss_node.npz')
-    loss_node_count1 = sparse.load_npz(loss_node_path1 + 'loss_node_count.npz')
-    loss_node2 = sparse.load_npz(loss_node_path2 + 'loss_node.npz')
-    loss_node_count2 = sparse.load_npz(loss_node_path2 + 'loss_node_count.npz')
-    loss_node3 = sparse.load_npz(loss_node_path3 + 'loss_node.npz')
-    loss_node_count3 = sparse.load_npz(loss_node_path3 + 'loss_node_count.npz')
 
-    gamma = 0.9
-    loss_node = loss_node1 + gamma*loss_node2 + gamma**2*loss_node3
+    # subsampling if the number of loss nodes is very large
+    if cnt_nz[0].shape[0] > 1000000:
+        cnt_nz_samp = np.int32(np.random.uniform(0, cnt_nz[0].shape[0]-1, 1000000))
+        cnt_nz_v = cnt_nz[0][cnt_nz_samp]
+        cnt_nz_n = cnt_nz[1][cnt_nz_samp]
+        cnt = cnt_nz[2][cnt_nz_samp]
+        lss = loss_nz[2][cnt_nz_samp]
+        
+    else:
+        cnt_nz_v = cnt_nz[0]
+        cnt_nz_n = cnt_nz[1]
+        cnt = cnt_nz[2]
+        lss = loss_nz[2]
+
+    vertex = features[cnt_nz_v]
+    neighbor = features[cnt_nz_n]
+    y = np.divide(lss, cnt)
     
-    loss_node_count = loss_node_count1 + loss_node_count2 + loss_node_count3
-     
-    idx_nz = sparse.find(loss_node_count)
-    '''
+    # plot histogram of reward
+    fig = plt.hist(y, bins=128, range=(0,np.mean(y)*2), alpha=0.7, color='k')
+    plt.xlabel('Value')
+    plt.ylabel('Number')
+    plt.savefig(loss_node_path + 'histogram_valuefunc.png')
+    
+    #plt.clf()
+    #y = (y-np.min(y))/(np.mean(y)-np.min(y))*255
+    #fig = plt.hist(y, bins=128, range=(0,1000), alpha=0.7, color='k')
+    #plt.xlabel('Value')
+    #plt.ylabel('Number')
+    #plt.savefig(loss_node_path + 'histogram_valuefunc_norm.png')
 
-    vertex = features[idx_nz[0]]
-    neighbor = features[idx_nz[1]]
-    count = idx_nz[2]
-    y = np.divide(sparse.find(loss_node)[2],count)
-   
     # partition train/validation data
     vertex_tr = vertex[:-batch_size]
     neighbor_tr = neighbor[:-batch_size]
@@ -1102,7 +772,9 @@ def train_sampler(train_data):
     summary_writer = tf.summary.FileWriter(sampler_log_dir(), sess.graph)
 
     # save model
-    saver = tf.train.Saver()
+    model_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+    saver = tf.train.Saver(var_list=model_vars)
+    #saver = tf.train.Saver()
     if FLAGS.allhop_rewards:
         model_path = './model/MLsampler-' + FLAGS.train_prefix.split('/')[-1] + '-' + model_prefix() + '-allhops'
     else:
@@ -1118,50 +790,67 @@ def train_sampler(train_data):
     # train
     total_steps = 0
     avg_time = 0.0
-    
-    #for epoch in range(50):
-    for epoch in range(FLAGS.epochs):
-        
-        # shuffle
-        perm = np.random.permutation(vertex_tr.shape[0])
+     
+    # learning rate of sampler needs to be smaller than gnn's for stable optimization
+    lr = [0.001]
 
-        print("Epoch: %04d" %(epoch+1))
+    val_loss_old = 0
 
-        for iter in range(iter_size):
-                    
-            # allocate batch
-            vtr = vertex_tr[perm[iter*batch_size:(iter+1)*batch_size]]
-            ntr = neighbor_tr[perm[iter*batch_size:(iter+1)*batch_size]]
-            ytr = y_tr[perm[iter*batch_size:(iter+1)*batch_size]]
+    for lr_iter in range(len(lr)):
 
-            t = time.time()
-            outs = sess.run([ loss, optimizer, merged_summary_op], feed_dict={x1_ph: vtr, x2_ph: ntr, y_ph: ytr})
-            train_loss = outs[0]
-           
-
-            # validation
-            if iter%FLAGS.validate_iter == 0:
-
-                outs = sess.run([ loss, optimizer, merged_summary_op], feed_dict={x1_ph: vertex_val, x2_ph: neighbor_val, y_ph: y_val})  
-                val_loss = outs[0]
-
-                
-            avg_time = (avg_time*total_steps+time.time() - t)/(total_steps+1)
-
-            # print 
-            if total_steps%FLAGS.print_every == 0:
-                print("Iter:", "%04d"%iter,
-                                "train_loss=", "{:.5f}".format(train_loss),
-                                "val_loss=", "{:.5f}".format(val_loss))
-
-            total_steps +=1
+        print ('learning rate= %f'%lr[lr_iter])
+        #optimizer = tf.train.AdamOptimizer(learning_rate=lr[lr_iter], name='Adam').minimize(loss)
             
-            if total_steps > FLAGS.max_total_steps:
-                break
-        
-        # save_model
-        save_path = saver.save(sess, model_path+'model.ckpt')
-        print ('model is saved at %s'%save_path)
+        #for epoch in range(epochs):
+        for epoch in range(30):
+
+            # shuffle
+            perm = np.random.permutation(vertex_tr.shape[0])
+
+            print("Epoch: %04d" %(epoch+1))
+
+            for iter in range(iter_size):
+                            
+                # allocate batch
+                vtr = vertex_tr[perm[iter*batch_size:(iter+1)*batch_size]]
+                ntr = neighbor_tr[perm[iter*batch_size:(iter+1)*batch_size]]
+                ytr = y_tr[perm[iter*batch_size:(iter+1)*batch_size]]
+
+                t = time.time()
+                outs = sess.run([ loss, optimizer, merged_summary_op], feed_dict={x1_ph: vtr, x2_ph: ntr, y_ph: ytr, lr_ph: lr[lr_iter]})
+                train_loss = outs[0]
+                   
+
+                # validation
+                if iter%FLAGS.validate_iter == 0:
+
+                    outs = sess.run([ loss, optimizer, merged_summary_op], feed_dict={x1_ph: vertex_val, x2_ph: neighbor_val, y_ph: y_val, lr_ph: lr[lr_iter]})  
+                    val_loss = outs[0]
+                    
+                    if val_loss == val_loss_old:
+                        
+                        sess.close()
+                        tf.reset_default_graph()
+                        return 0
+                    else:
+                        val_loss_old = val_loss
+                        
+                avg_time = (avg_time*total_steps+time.time() - t)/(total_steps+1)
+
+                # print 
+                if total_steps%FLAGS.print_every == 0:
+                    print("Iter:", "%04d"%iter,
+                                        "train_loss=", "{:.5f}".format(train_loss),
+                                        "val_loss=", "{:.5f}".format(val_loss))
+
+                total_steps +=1
+                    
+                if total_steps > FLAGS.max_total_steps:
+                    break
+                
+            # save_model
+            save_path = saver.save(sess, model_path+'model.ckpt')
+            print ('model is saved at %s'%save_path)
 
     sess.close()
     tf.reset_default_graph()
@@ -1173,7 +862,7 @@ def main(argv=None):
     print("Loading training data..")
     train_data = load_data(FLAGS.train_prefix)
     print("Done loading training data..")
-
+ 
     print("Start training uniform sampling + graphsage model..")
     if FLAGS.allhop_rewards:
         
@@ -1210,10 +899,9 @@ def main(argv=None):
     print("Start training ML sampler..")
     train_sampler(train_data)
     print("Done training ML sampler..")
-    
+
     ## train 
     print("Start training ML sampling + graphsage model..")
-    
     if FLAGS.fast_ver: 
         train(train_data, sampler_name='FastML')
     else:
