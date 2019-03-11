@@ -975,7 +975,7 @@ def train_sampler(train_data):
 #        loss += FLAGS.weight_decay * tf.nn.l2_loss(var)
 #
     
-    optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate, name='Adam').minimize(loss)
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.01, name='Adam').minimize(loss)
     init = tf.global_variables_initializer()
 
 
@@ -995,13 +995,29 @@ def train_sampler(train_data):
     loss_node = sparse.load_npz(loss_node_path + 'loss_node.npz')
     loss_node_count = sparse.load_npz(loss_node_path + 'loss_node_count.npz')
  
-    idx_nz = sparse.find(loss_node_count)
-   
+    cnt_nz = sparse.find(loss_node_count)
+    lss_nz = sparse.find(loss_node)
+
     # due to out of memory, select randomly limited number of data node
-    vertex = features[idx_nz[0]]
-    neighbor = features[idx_nz[1]]
-    count = idx_nz[2]
-    y = np.divide(sparse.find(loss_node)[2],count)
+    if cnt_nz[0].shape[0] > 1000000:
+        nz_samp = np.int32(np.random.uniform(0, cnt_nz[0].shape[0]-1, 1000000))
+        
+        cnt_nz_v = cnt_nz[0][nz_samp]
+        cnt_nz_n = cnt_nz[1][nz_samp]
+        cnt = cnt_nz[2][nz_samp]
+        lss= lss_nz[2][nz_samp]
+        
+        vertex = features[cnt_nz_v]
+        neighbor = features[cnt_nz_n]
+        y = np.divide(lss, cnt)
+    
+    else:
+        
+        vertex = features[cnt_nz[0]]
+        neighbor = features[cnt_nz[1]]
+        cnt = cnt_nz[2]
+        lss = lss_nz[2]
+        y = np.divide(lss, cnt)
     #'''
     
     '''
@@ -1070,7 +1086,7 @@ def train_sampler(train_data):
     avg_time = 0.0
     
     #for epoch in range(50):
-    for epoch in range(FLAGS.epochs):
+    for epoch in range(30):
         
         # shuffle
         perm = np.random.permutation(vertex_tr.shape[0])
