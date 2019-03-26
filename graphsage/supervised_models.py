@@ -2,7 +2,7 @@ import tensorflow as tf
 
 import graphsage.models as models
 import graphsage.layers as layers
-from graphsage.aggregators import MeanAggregator, LRMeanAggregator, LogicMeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator
+from graphsage.aggregators import MeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator
 
 import numpy as np
 
@@ -34,12 +34,6 @@ class SupervisedGraphsage(models.SampleAndAggregate):
 
         if aggregator_type == "mean":
             self.aggregator_cls = MeanAggregator
-        elif aggregator_type == "LRmean":
-            self.aggregator_cls = LRMeanAggregator
-        elif aggregator_type == "logicmean":
-            self.aggregator_cls = LogicMeanAggregator
-        elif aggregator_type == "attmean":
-            self.aggregator_cls = AttMeanAggregator
         elif aggregator_type == "seq":
             self.aggregator_cls = SeqAggregator
         elif aggregator_type == "meanpool":
@@ -127,46 +121,7 @@ class SupervisedGraphsage(models.SampleAndAggregate):
         self.opt_op = self.optimizer.apply_gradients(clipped_grads_and_vars)
         self.preds = self.predict()
         #self.micro_f1 = self.calc_micro_f1()
-#        
-#    # added
-#    def loss_to_adj(self, samples, support_size, num_samples):
-#        import pdb
-#        pdb.set_trace()
-#        batch_size = self.batch_size
-#
-#        total_length = 0
-#        for i in range(num_samples):
-#            total_length += support_size[i+1]
-#        total_length *= batch_size
-#
-#        link_vec = tf.Variable(tf.zeros([2,total_length]), trainable=False)
-#
-#        for i in range(support_size-1):
-#            vert = samples[i]
-#            neig = samples[i+1]
-#            num_sample = support_size[i+1]/support_size[i]
-#
-#
-#
-#        link_vec = tf.Variable(tf.zeros(, trainable=False, 
-#        for k in range(1, len(samples)):
-#
-#            vert = samples[k-1]
-#            neig = samples[k]
-#            link_vec = vert
-#
-#
-# i           bv = batch_size*support_size[k-1]
-#            bn = batch_size*support_size[k]
-#
-#            for l in range(batch_size):
-#                vertex = tf.slice(samples, [0, bv*l], support_size[k-1])
-#                neighbor = tf.slice(samples, [0, bn*l], support_size[k])
-#                adj_v = tf.gather_nd(self.adj_info, [vertex])
-#                idx_n = tf.where(tf.equal(adj_v, neighbor))  
-#                tf.constant(self.loss, [support_size
-#                tf.scatter_nd(idx_n, updates, shape)
-#      
+      
     # added
     def sparse_loss_to_node(self, samples, support_size, num_samples):
         
@@ -177,10 +132,6 @@ class SupervisedGraphsage(models.SampleAndAggregate):
 
         #discount = .9
         for k in range(1, 2):
-        #for k in range(1, len(samples)):
-
-            #import pdb
-            #pdb.set_trace()
 
             x = tf.reshape(tf.tile(tf.expand_dims(samples[k-1], -1), [1, tf.cast(support_size[k]/support_size[k-1], tf.int32)]), [-1])
             x = tf.cast(x, tf.int64)
@@ -189,13 +140,12 @@ class SupervisedGraphsage(models.SampleAndAggregate):
             idx = tf.expand_dims(x*node_dim[0] + y,1)
         
             #loss = (discount**(k-1))*tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy, 1), -1), [1, support_size[k]]), [-1])
-            #import pdb
-            #pdb.set_trace()
-            if self.sigmoid_loss:
-                loss = tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy, 1), -1), [1, support_size[k]]), [-1])
+            
+            if FLAGS.sigmoid == True:
+                loss = tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy+1e-20, 1), -1), [1, support_size[k]]), [-1])
             else:
                 loss = tf.reshape(tf.tile(tf.expand_dims(self.cross_entropy+1e-20, -1), [1, support_size[k]]), [-1])
-            scatter1 = tf.SparseTensor(idx, loss, tf.constant([node_dim[0]*node_dim[1]], dtype=tf.int64))
+            scatter1 = tf.SparseTensor(idx, loss+1e-20, tf.constant([node_dim[0]*node_dim[1]], dtype=tf.int64))
             scatter1 = tf.sparse_reshape(scatter1, tf.constant([node_dim[0], node_dim[1]]))
             self.loss_node = tf.sparse_add(self.loss_node, scatter1)
 
@@ -205,35 +155,6 @@ class SupervisedGraphsage(models.SampleAndAggregate):
             scatter2 = tf.sparse_reshape(scatter2, tf.constant([node_dim[0], node_dim[1]]))
             self.loss_node_count = tf.sparse_add(self.loss_node_count, scatter2) 
 
-
-#    def loss_to_node(self, samples, support_size, num_samples):
-#        
-#        batch_size = self.batch_size
-#        
-#        length = sum(support_size[1:])*batch_size
-#        node_dim = self.loss_node.get_shape().as_list()
-#
-#        for k in range(1, len(samples)):
-#
-#            x = tf.reshape(tf.tile(tf.expand_dims(samples[k-1], -1), [1, support_size[k]/support_size[k-1]]), [-1])
-#            x = tf.cast(x, tf.int64)
-#            y = samples[k]
-#            y = tf.cast(y, tf.int64)
-#            idx = tf.expand_dims(x*node_dim[0] + y,1)
-#            #idx = tf.stack([x,y], axis=1)
-#          
-#            loss = tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy, 1), -1), [1, support_size[k]]), [-1])
-#        
-#
-#            scatter = tf.scatter_nd(idx, loss, tf.constant([node_dim[0]*node_dim[1]], dtype=tf.int64))
-#            scatter = tf.reshape(scatter, tf.constant([node_dim[0], node_dim[1]]))
-#            self.loss_node = tf.assign_add(self.loss_node, scatter)
-#
-#            ones = tf.reshape(tf.tile(tf.expand_dims(tf.ones(batch_size), -1), [1, support_size[k]]), [-1])
-#            scatter = tf.scatter_nd(idx, ones, tf.constant([node_dim[0]*node_dim[1]], dtype=tf.int64))
-#            scatter = tf.reshape(scatter, tf.constant([node_dim[0], node_dim[1]]))
-#            self.loss_node_count = tf.assign_add(self.loss_node_count, scatter) 
-#            
 
     def _loss(self):
         # Weight decay loss
@@ -260,63 +181,9 @@ class SupervisedGraphsage(models.SampleAndAggregate):
         tf.summary.scalar('loss', self.loss)
         
         
-
-        
-        
-
-#     def _loss(self):
-#        # Weight decay loss
-#        for aggregator in self.aggregators:
-#            for var in aggregator.vars.values():
-#                self.loss += FLAGS.weight_decay * tf.nn.l2_loss(var)
-#        for var in self.node_pred.vars.values():
-#            self.loss += FLAGS.weight_decay * tf.nn.l2_loss(var)
-#       
-#        # classification loss
-#        if self.sigmoid_loss:
-#            self.loss += tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-#                    logits=self.node_preds,
-#                    labels=self.placeholders['labels']))
-#        else:
-#            self.loss += tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-#                    logits=self.node_preds,
-#                    labels=self.placeholders['labels']))
-#
-#        tf.summary.scalar('loss', self.loss)
-        
-
-
-
     def predict(self):
         if self.sigmoid_loss:
             return tf.nn.sigmoid(self.node_preds)
         else:
             return tf.nn.softmax(self.node_preds)
 
-
-    '''
-    def calc_micro_f1(self):
-       
-
-        import pdb
-        pdb.set_trace()
-
-        predicted = tf.round(self.preds)
-
-        # Use integers to avoid any nasty FP behaviour
-        predicted = tf.cast(predicted, dtype=tf.float32)
-        labels = tf.cast(self.placeholders['labels'], dtype=tf.float32)
-        
-        # Count true positives, true negatives, false positives and false negatives.
-        tp = tf.count_nonzero(predicted * labels)
-        tn = tf.count_nonzero((predicted - 1) * (labels - 1))
-        fp = tf.count_nonzero(predicted * (labels - 1))
-        fn = tf.count_nonzero((predicted - 1) * labels)
-
-        # Calculate accuracy, precision, recall and F1 score.
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-        fmeasure = (2 * precision * recall) / (precision + recall)
-        fmeasure = tf.cast(fmeasure, tf.float32)
-        return fmeasure
-    '''

@@ -7,7 +7,7 @@ import graphsage.layers as layers
 import graphsage.metrics as metrics
 
 from .prediction import BipartiteEdgePredLayer
-from .aggregators import MeanAggregator, LRMeanAggregator, LogicMeanAggregator, AttMeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator
+from .aggregators import MeanAggregator, MaxPoolingAggregator, MeanPoolingAggregator, SeqAggregator, GCNAggregator
 
 import numpy as np
 
@@ -215,12 +215,6 @@ class SampleAndAggregate(GeneralizedModel):
         super(SampleAndAggregate, self).__init__(**kwargs)
         if aggregator_type == "mean":
             self.aggregator_cls = MeanAggregator
-        elif aggregator_type == "LRmean":
-            self.aggregator_cls = LRMeanAggregator
-        elif aggregator_type == "logicmean":
-            self.aggregator_cls = LogicMeanAggregator
-        elif aggregator_type == "attmean":
-            self.aggregator_cls = AttMeanAggregator
         elif aggregator_type == "seq":
             self.aggregator_cls = SeqAggregator
         elif aggregator_type == "maxpool":
