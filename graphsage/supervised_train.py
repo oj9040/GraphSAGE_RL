@@ -185,12 +185,6 @@ def construct_placeholders(num_classes):
 
 def train(train_data, test_data=None, sampler_name='Uniform'):
     
-    # Set random seed
-    seed = 123
-    np.random.seed(seed)
-    tf.set_random_seed(seed)
-
-
     G = train_data[0]
     features = train_data[1]
     id_map = train_data[2]
@@ -618,14 +612,8 @@ def train(train_data, test_data=None, sampler_name='Uniform'):
 # Sampler
 def train_sampler(train_data):
     
-    # Set random seed
-    seed = 123
-    np.random.seed(seed)
-    tf.set_random_seed(seed)
-
     features = train_data[1]
     #batch_size = FLAGS.batch_size
-    epochs = FLAGS.epochs
     batch_size = 512
 
     if not features is None:
@@ -686,7 +674,7 @@ def train_sampler(train_data):
         samples = [FLAGS.samples_1, FLAGS.samples_2, FLAGS.samples_3]
 
         numhop = np.count_nonzero(samples)
-        gamma = 0.1
+        gamma = 0.8
         loss_node = 0
         loss_node_count = 0
         for i in reversed(range(0, numhop)):
@@ -802,7 +790,7 @@ def train_sampler(train_data):
         #optimizer = tf.train.AdamOptimizer(learning_rate=lr[lr_iter], name='Adam').minimize(loss)
             
         #for epoch in range(epochs):
-        for epoch in range(30):
+        for epoch in range(50):
 
             # shuffle
             perm = np.random.permutation(vertex_tr.shape[0])
@@ -862,7 +850,7 @@ def main(argv=None):
     print("Loading training data..")
     train_data = load_data(FLAGS.train_prefix)
     print("Done loading training data..")
- 
+
     print("Start training uniform sampling + graphsage model..")
     if FLAGS.allhop_rewards:
         

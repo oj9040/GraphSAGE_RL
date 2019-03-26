@@ -142,9 +142,9 @@ class SupervisedGraphsage(models.SampleAndAggregate):
             #loss = (discount**(k-1))*tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy, 1), -1), [1, support_size[k]]), [-1])
             
             if FLAGS.sigmoid == True:
-                loss = tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy, 1), -1), [1, support_size[k]]), [-1])
+                loss = tf.reshape(tf.tile(tf.expand_dims(tf.reduce_sum(self.cross_entropy+1e-20, 1), -1), [1, support_size[k]]), [-1])
             else:
-                loss = tf.reshape(tf.tile(tf.expand_dims(self.cross_entropy, -1), [1, support_size[k]]), [-1])
+                loss = tf.reshape(tf.tile(tf.expand_dims(self.cross_entropy+1e-20, -1), [1, support_size[k]]), [-1])
             scatter1 = tf.SparseTensor(idx, loss+1e-20, tf.constant([node_dim[0]*node_dim[1]], dtype=tf.int64))
             scatter1 = tf.sparse_reshape(scatter1, tf.constant([node_dim[0], node_dim[1]]))
             self.loss_node = tf.sparse_add(self.loss_node, scatter1)
