@@ -111,10 +111,10 @@ Note that the full log outputs and stored embeddings can be 5-10Gb in size (on t
 
 #### Bibliography
 
-@article{oh2019advancing,
-  title={Advancing GraphSAGE with A Data-Driven Node Sampling},
-    author={Oh, Jihun and Cho, Kyunghyun and Bruna, Joan},
-      journal={arXiv preprint arXiv:1904.12935},
-        year={2019}
+@article{oh2019advancing,  
+  title={Advancing GraphSAGE with A Data-Driven Node Sampling},  
+    author={Oh, Jihun and Cho, Kyunghyun and Bruna, Joan},  
+      journal={arXiv preprint arXiv:1904.12935},  
+        year={2019}  
         }
 
