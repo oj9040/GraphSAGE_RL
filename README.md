@@ -1,9 +1,9 @@
 ## Advancing GraphSAGE with A Data-driven Node Sampling
 
-#### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
+### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
-#### Paper
-[GraphSAGE_RL](https://arxiv.org/abs/1904.12935)
+### Paper
+[Paper](https://arxiv.org/abs/1904.12935) presented at ICLR 2019 workshop on Representation Learning on Graphs and Manifolds.
 
 ### Overview
 As an efficient and scalable graph neural network, GraphSAGE has enabled an inductive
@@ -111,11 +111,11 @@ Note that the full log outputs and stored embeddings can be 5-10Gb in size (on t
 
 
 #### Bibliography
-
+```
 @article{oh2019advancing,  
   title={Advancing GraphSAGE with A Data-Driven Node Sampling},  
     author={Oh, Jihun and Cho, Kyunghyun and Bruna, Joan},  
       journal={arXiv preprint arXiv:1904.12935},  
         year={2019}  
         }
-
+```
