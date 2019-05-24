@@ -1,38 +1,26 @@
-## GraphSAGE_RL (GraphSAGE + Reinforcement Learning-based Node Sampling)
+## Advancing GraphSAGE with A Data-driven Node Sampling
 
 #### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
 ### Overview
-
 This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE).
 
-Large-scale graph data with sparse connectivity becomes prevalent
-in a wide spectrum of areas, from web community detection through
-to biological or physical discovery. As an efficient and scalable graph
-neural network, GraphSAGE has enabled an inductive capability for
-inferring unseen nodes or graphs by aggregating subsampled local
-neighborhoods and by learning in a mini-batch gradient descent
-fashion. This neighborhood sampling is also fascinating in order
-to improve computing and memory efficiency when inferring a
-batch of target nodes with diverse degrees in parallel. Despite these
-advantages, the default uniform sampling suffers from high variance
-in training and inference, leading to sub-optimum accuracy.
-We propose a new data-driven sampling approach to reason
-about the real-valued importance of a neighborhood by a nonlinear
-regressor, and to use the value as a criterion for subsampling
-neighborhoods. The regressor is learned using a value-based
-reinforcement learning. The implied importance for each combination
-of vertex and neighborhood is inductively extracted from
-the negative classification loss output of GraphSAGE. Moreover,
-multi-hop rewards from auxiliary classifiers added at intermediate
-layers gradually influence the value function. Then, a non-linear
-regressor is trained using the extracted values and nodes’ attributes.
-The high complexity of sorting the regressor’s output in testing is
-minimized by replacing it with a grouped argmax operation, leading
-to a two-fold reduction in complexity. As a result, in an inductive
-node classification benchmark using three datasets, our method
-enhanced the baseline using the uniform sampling by 12.6% at best,
-outperforming recent variants of a graph neural network.
+As an efficient and scalable graph neural network, GraphSAGE has enabled an inductive
+capability for inferring unseen nodes or graphs by aggregating subsampled
+local neighborhoods and by learning in a mini-batch gradient descent fashion. The
+neighborhood sampling used in GraphSAGE is effective in order to improve computing
+and memory efficiency when inferring a batch of target nodes with diverse
+degrees in parallel. Despite this advantage, the default uniform sampling suffers
+from high variance in training and inference, leading to sub-optimum accuracy.
+We propose a new data-driven sampling approach to reason about the real-valued
+importance of a neighborhood by a non-linear regressor, and to use the value as a
+criterion for subsampling neighborhoods. The regressor is learned using a valuebased
+reinforcement learning. The implied importance for each combination of
+vertex and neighborhood is inductively extracted from the negative classification
+loss output of GraphSAGE. As a result, in an inductive node classification benchmark
+using three datasets, our method enhanced the baseline using the uniform
+sampling, outperforming recent variants of a graph neural network in accuracy.
+
 
 ### Requirements
 
@@ -120,4 +108,13 @@ The supervised model will output F1 scores, while the unsupervised model will tr
 The unsupervised embeddings will be stored in a numpy formated file named val.npy with val.txt specifying the order of embeddings as a per-line list of node ids.
 Note that the full log outputs and stored embeddings can be 5-10Gb in size (on the full data when running with the unsupervised variant).
 
+
+#### Bibliography
+
+@article{oh2019advancing,
+  title={Advancing GraphSAGE with A Data-Driven Node Sampling},
+    author={Oh, Jihun and Cho, Kyunghyun and Bruna, Joan},
+      journal={arXiv preprint arXiv:1904.12935},
+        year={2019}
+        }
 
