@@ -2,9 +2,10 @@
 
 #### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
 
-### Overview
-This work is an improved version of [GraphSAGE](https://github.com/williamleif/GraphSAGE).
+#### Paper
+[GraphSAGE_RL](https://arxiv.org/abs/1904.12935)
 
+### Overview
 As an efficient and scalable graph neural network, GraphSAGE has enabled an inductive
 capability for inferring unseen nodes or graphs by aggregating subsampled
 local neighborhoods and by learning in a mini-batch gradient descent fashion. The
