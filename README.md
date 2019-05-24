@@ -1,8 +1,7 @@
 ## Advancing GraphSAGE with A Data-driven Node Sampling
 
-### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)
+#### Authors: [Jihun Oh](http://jihunoh.weebly.com) (oj9040@gmail.com, jihun2331.oh@samsung.com), [Kyunghyun Cho](http://www.kyunghyuncho.me) (kyunghyun.cho@nyu.edu), [Joan Bruna](https://cims.nyu.edu/~bruna/) (bruna@cims.nyu.edu)  
 
-### Paper
 [Paper](https://arxiv.org/abs/1904.12935) presented at ICLR 2019 workshop on Representation Learning on Graphs and Manifolds.
 
 ### Overview
